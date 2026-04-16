@@ -80,7 +80,7 @@ h1 {
     box-shadow: 0 4px 15px rgba(124, 77, 255, 0.4);
 }
 
-/* Cartes métriques avec style amélioré */
+/* Cartes métriques */
 .metric-card {
     background: rgba(18, 22, 40, 0.95);
     border-radius: 12px;
