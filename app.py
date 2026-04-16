@@ -35,13 +35,13 @@ h1 {
 
 .subtitle {
     text-align: center;
-    color: #5A6A8A;
+    color: #FF914D;
     letter-spacing: 3px;
     font-size: 9px;
     margin-top: 0;
 }
 
-/* ========== RADIO BUTTONS AMÉLIORÉS ========== */
+/* Radio buttons */
 .stRadio {
     margin: 20px 0;
 }
@@ -72,7 +72,6 @@ h1 {
 .stRadio div[data-baseweb="radio"] {
     display: none;
 }
-/* Option active */
 .stRadio div[role="radiogroup"] > div:has(input:checked) label {
     background: linear-gradient(135deg, #7C4DFF 0%, #00D4AA 100%) !important;
     border-color: transparent !important;
@@ -126,10 +125,13 @@ h1 {
     font-weight: 700;
 }
 
-.ci-band {
-    color: #5A6A8A;
-    font-size: 9px;
+/* FIABILITÉ EN ORANGE */
+.fiability {
+    color: #FF914D !important;
+    font-size: 11px;
+    font-weight: 600;
     margin-top: 6px;
+    letter-spacing: 0.5px;
 }
 
 /* Badges */
@@ -212,34 +214,13 @@ h1 {
     color: white;
 }
 
-/* Résultats de recherche */
-.search-results {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin: 15px 0;
-}
-.search-result-btn {
-    background: #0D0F1A;
-    border: 1px solid #1E2340;
-    border-radius: 30px;
-    padding: 8px 16px;
-    color: #7C4DFF;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-}
-.search-result-btn:hover {
-    background: #7C4DFF;
-    color: white;
-}
-
 /* Fix mobile */
 @media (max-width: 640px) {
     .pred-price { font-size: 16px; }
     .metric-card { padding: 8px; }
     .pred-card { padding: 8px 4px; }
     .stRadio label { padding: 8px 18px !important; font-size: 13px !important; }
+    .fiability { font-size: 9px; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -326,11 +307,17 @@ def calculate_predictions(data, current_price):
     pred_30d = current_price * (1 + trend/12 + vol * 0.15 + momentum_20 * 0.2)
     pred_6m = current_price * (1 + trend/2 + vol * 0.25 + momentum_20 * 0.15)
     
+    # Calcul de la fiabilité (inverse de la volatilité + horizon)
+    fiability_24h = max(5, min(95, int(100 - vol * 100 * 0.3)))
+    fiability_7d = max(5, min(90, int(100 - vol * 100 * 0.5)))
+    fiability_30d = max(5, min(85, int(100 - vol * 100 * 0.7)))
+    fiability_6m = max(5, min(80, int(100 - vol * 100 * 1.0)))
+    
     return {
-        "24H": pred_24h,
-        "7J": pred_7d,
-        "30J": pred_30d,
-        "6M": pred_6m,
+        "24H": {"price": pred_24h, "fiability": fiability_24h},
+        "7J": {"price": pred_7d, "fiability": fiability_7d},
+        "30J": {"price": pred_30d, "fiability": fiability_30d},
+        "6M": {"price": pred_6m, "fiability": fiability_6m},
     }, vol, trend
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -352,23 +339,23 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
-# RECHERCHE - RADIO BUTTONS AMÉLIORÉS
+# RECHERCHE
 # ══════════════════════════════════════════════════════════════════════════════
-st.markdown('<p style="text-align: center; color: #8A9AB0; font-size: 13px; margin-bottom: 5px;">🔍 TYPE DE RECHERCHE</p>', unsafe_allow_html=True)
+st.markdown('<p style="text-align: center; color: #FF914D; font-size: 13px; margin-bottom: 5px;">🔍 TYPE DE RECHERCHE</p>', unsafe_allow_html=True)
 search_type = st.radio("", ["📊 SYMBOLE", "🔢 ISIN", "🔍 NOM"], horizontal=True, label_visibility="collapsed")
 
 query = ""
 
 # ─────────────── MODE SYMBOLE ───────────────
 if search_type == "📊 SYMBOLE":
-    st.markdown('<p style="color: #7C4DFF; font-size: 12px; margin-bottom: 5px;">Entrez un symbole boursier</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #FF914D; font-size: 12px; margin-bottom: 5px;">Entrez un symbole boursier</p>', unsafe_allow_html=True)
     query = st.text_input("", value="AAPL", placeholder="Ex: AAPL, TSLA, MSFT, NVDA, IREN", label_visibility="collapsed")
     if query:
         st.session_state.selected_symbol = query.upper()
 
 # ─────────────── MODE ISIN ───────────────
 elif search_type == "🔢 ISIN":
-    st.markdown('<p style="color: #7C4DFF; font-size: 12px; margin-bottom: 5px;">Entrez un code ISIN (12 caractères)</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #FF914D; font-size: 12px; margin-bottom: 5px;">Entrez un code ISIN (12 caractères)</p>', unsafe_allow_html=True)
     isin_input = st.text_input("", placeholder="Ex: US0378331005 pour Apple", label_visibility="collapsed")
     if isin_input:
         ticker_result = isin_to_ticker(isin_input)
@@ -380,7 +367,7 @@ elif search_type == "🔢 ISIN":
 
 # ─────────────── MODE NOM ───────────────
 elif search_type == "🔍 NOM":
-    st.markdown('<p style="color: #7C4DFF; font-size: 12px; margin-bottom: 5px;">Entrez le nom d\'une entreprise</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #FF914D; font-size: 12px; margin-bottom: 5px;">Entrez le nom d\'une entreprise</p>', unsafe_allow_html=True)
     name_input = st.text_input("", placeholder="Ex: Apple, Tesla, BNP Paribas", label_visibility="collapsed")
     if name_input:
         with st.spinner("Recherche..."):
@@ -396,7 +383,6 @@ elif search_type == "🔍 NOM":
                         st.session_state.analyze_clicked = True
                         st.rerun()
             
-            # Afficher les noms complets
             for match in matches:
                 st.caption(f"📌 {match['symbol']} - {match['name']}")
         elif name_input:
@@ -455,7 +441,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             </div>
             """, unsafe_allow_html=True)
             
-            # Graphique
+            # Graphique SANS ZOOM
             fig = go.Figure()
             fig.add_trace(go.Scatter(
                 x=data.index,
@@ -482,7 +468,9 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             fig.update_xaxes(showgrid=False, zeroline=False, color='#2A3050')
             fig.update_yaxes(showgrid=True, gridcolor='#1A1E30', zeroline=False)
             
-            st.plotly_chart(fig, use_container_width=True)
+            # DÉSACTIVATION DU ZOOM
+            config = {'displayModeBar': True, 'scrollZoom': False, 'staticPlot': False}
+            st.plotly_chart(fig, use_container_width=True, config=config)
             
             # Prédictions
             predictions, vol, trend = calculate_predictions(data, current_price)
@@ -492,50 +480,54 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             col1, col2, col3, col4 = st.columns(4)
             
             with col1:
-                pred = predictions["24H"]
+                pred = predictions["24H"]["price"]
+                fiab = predictions["24H"]["fiability"]
                 change_pct = ((pred - current_price) / current_price) * 100
                 st.markdown(f"""
                 <div class="pred-card">
                     <div class="pred-label">24 HEURES</div>
                     <div class="pred-price">${pred:.2f}</div>
                     <div class="{'pred-up' if change_pct >= 0 else 'pred-down'}">{change_pct:+.1f}%</div>
-                    <div class="ci-band">±{vol*0.5*100:.0f}%</div>
+                    <div class="fiability">🔒 Fiabilité : {fiab}%</div>
                 </div>
                 """, unsafe_allow_html=True)
             
             with col2:
-                pred = predictions["7J"]
+                pred = predictions["7J"]["price"]
+                fiab = predictions["7J"]["fiability"]
                 change_pct = ((pred - current_price) / current_price) * 100
                 st.markdown(f"""
                 <div class="pred-card">
                     <div class="pred-label">7 JOURS</div>
                     <div class="pred-price">${pred:.2f}</div>
                     <div class="{'pred-up' if change_pct >= 0 else 'pred-down'}">{change_pct:+.1f}%</div>
-                    <div class="ci-band">±{vol*0.7*100:.0f}%</div>
+                    <div class="fiability">🔒 Fiabilité : {fiab}%</div>
                 </div>
                 """, unsafe_allow_html=True)
             
             with col3:
-                pred = predictions["30J"]
+                pred = predictions["30J"]["price"]
+                fiab = predictions["30J"]["fiability"]
                 change_pct = ((pred - current_price) / current_price) * 100
                 st.markdown(f"""
                 <div class="pred-card">
                     <div class="pred-label">30 JOURS</div>
                     <div class="pred-price">${pred:.2f}</div>
                     <div class="{'pred-up' if change_pct >= 0 else 'pred-down'}">{change_pct:+.1f}%</div>
-                    <div class="ci-band">±{vol*1.0*100:.0f}%</div>
+                    <div class="fiability">🔒 Fiabilité : {fiab}%</div>
                 </div>
                 """, unsafe_allow_html=True)
             
             with col4:
-                pred = predictions["6M"]
+                pred = predictions["6M"]["price"]
+                fiab = predictions["6M"]["fiability"]
                 change_pct = ((pred - current_price) / current_price) * 100
                 st.markdown(f"""
                 <div class="pred-card">
                     <div class="pred-label">6 MOIS</div>
                     <div class="pred-price">${pred:.2f}</div>
                     <div class="{'pred-up' if change_pct >= 0 else 'pred-down'}">{change_pct:+.1f}%</div>
-                    <div class="ci-band">±{vol*1.5*100:.0f}%</div>
+                    <div class="fiability">🔒 Fiabilité : {fiab}%</div>
                 </div>
                 """, unsafe_allow_html=True)
             
@@ -547,14 +539,14 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             dir_acc = 58 + (np.random.randn() * 3)
             col_a.markdown(f"""
             <div class="metric-card">
-                <div style="font-size: 9px; color: #7C4DFF;">DIRECTION</div>
+                <div style="font-size: 9px; color: #FF914D;">DIRECTION</div>
                 <div style="font-size: 20px; font-weight: 700; color: #00D4AA;">{dir_acc:.0f}%</div>
             </div>
             """, unsafe_allow_html=True)
             
             col_b.markdown(f"""
             <div class="metric-card">
-                <div style="font-size: 9px; color: #7C4DFF;">VOLATILITÉ</div>
+                <div style="font-size: 9px; color: #FF914D;">VOLATILITÉ</div>
                 <div style="font-size: 20px; font-weight: 700;">{vol*100:.0f}%</div>
             </div>
             """, unsafe_allow_html=True)
@@ -563,7 +555,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             sharpe_color = "#00D4AA" if sharpe > 0.5 else "#FFB74D"
             col_c.markdown(f"""
             <div class="metric-card">
-                <div style="font-size: 9px; color: #7C4DFF;">SHARPE</div>
+                <div style="font-size: 9px; color: #FF914D;">SHARPE</div>
                 <div style="font-size: 20px; font-weight: 700; color: {sharpe_color};">{sharpe:.2f}</div>
             </div>
             """, unsafe_allow_html=True)
@@ -571,7 +563,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             confidence = min(95, 65 + int(vol*100))
             col_d.markdown(f"""
             <div class="metric-card">
-                <div style="font-size: 9px; color: #7C4DFF;">CONFIDENCE</div>
+                <div style="font-size: 9px; color: #FF914D;">CONFIDENCE</div>
                 <div style="font-size: 20px; font-weight: 700; color: #7C4DFF;">{confidence}%</div>
             </div>
             """, unsafe_allow_html=True)
