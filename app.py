@@ -22,7 +22,6 @@ st.markdown("""
     background: linear-gradient(135deg, #0A0E1A 0%, #0F1322 100%);
 }
 
-/* Header */
 h1 {
     text-align: center;
     background: linear-gradient(135deg, #FFFFFF 0%, #7C4DFF 50%, #00D4AA 100%);
@@ -41,7 +40,6 @@ h1 {
     margin-top: 0;
 }
 
-/* Radio buttons */
 .stRadio {
     margin: 20px 0;
 }
@@ -80,7 +78,6 @@ h1 {
     box-shadow: 0 4px 15px rgba(124, 77, 255, 0.4);
 }
 
-/* Cartes métriques */
 .metric-card {
     background: rgba(18, 22, 40, 0.95);
     border-radius: 12px;
@@ -114,7 +111,6 @@ h1 {
     border-top: 1px solid rgba(124, 77, 255, 0.2);
 }
 
-/* Cartes prédictions */
 .pred-card {
     background: #0D0F1A;
     border-radius: 16px;
@@ -154,10 +150,8 @@ h1 {
     font-size: 11px;
     font-weight: 600;
     margin-top: 6px;
-    letter-spacing: 0.5px;
 }
 
-/* Badges */
 .model-badge {
     background: rgba(124, 77, 255, 0.15);
     border: 1px solid rgba(124, 77, 255, 0.3);
@@ -168,7 +162,6 @@ h1 {
     color: #7C4DFF;
 }
 
-/* Section titles */
 .section-title {
     color: white;
     font-size: 14px;
@@ -178,7 +171,6 @@ h1 {
     border-bottom: 2px solid rgba(124, 77, 255, 0.3);
 }
 
-/* Inputs */
 .stTextInput > div > div > input {
     background: #0D0F1A !important;
     border: 2px solid #7C4DFF !important;
@@ -192,17 +184,7 @@ h1 {
     border-color: #00D4AA !important;
     box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2);
 }
-.stTextInput > div > div > input::placeholder {
-    color: #4A5070 !important;
-    font-weight: 400;
-}
 
-/* Labels */
-.stMarkdown p {
-    color: #7C4DFF !important;
-}
-
-/* Button */
 .stButton > button {
     background: linear-gradient(90deg, #7C4DFF 0%, #00D4AA 100%) !important;
     color: white !important;
@@ -210,17 +192,9 @@ h1 {
     padding: 12px !important;
     font-weight: 700 !important;
     font-size: 16px !important;
-    letter-spacing: 1px !important;
     width: 100% !important;
 }
 
-/* Alert */
-.stAlert {
-    background: #0D0F1A !important;
-    border-color: #7C4DFF !important;
-}
-
-/* Disclaimer */
 .disclaimer {
     background: rgba(255, 77, 109, 0.1);
     border: 1px solid rgba(255, 77, 109, 0.2);
@@ -235,14 +209,12 @@ h1 {
     margin: 0;
 }
 
-/* Current price card */
 .current-price {
     font-size: 36px;
     font-weight: 800;
     color: white;
 }
 
-/* Légende du graphique */
 .legend-box {
     background: #0D0F1A;
     border: 1px solid #1E2340;
@@ -273,7 +245,6 @@ h1 {
     opacity: 0.5;
 }
 
-/* Glossaire */
 .glossary {
     background: rgba(124, 77, 255, 0.05);
     border-radius: 10px;
@@ -284,28 +255,20 @@ h1 {
     color: #7C4DFF;
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 1px;
     margin-bottom: 8px;
 }
 .glossary-item {
     font-size: 9px;
     color: #8A9AB0;
     margin: 5px 0;
-    line-height: 1.4;
 }
 .glossary-item strong {
     color: #00D4AA;
 }
 
-/* Fix mobile */
 @media (max-width: 640px) {
     .pred-price { font-size: 16px; }
-    .metric-card { padding: 8px; }
-    .pred-card { padding: 8px 4px; }
     .stRadio label { padding: 8px 18px !important; font-size: 13px !important; }
-    .fiability { font-size: 9px; }
-    .legend-item { font-size: 9px; }
-    .metric-explanation { font-size: 7px; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -315,13 +278,46 @@ h1 {
 # ══════════════════════════════════════════════════════════════════════════════
 ALPHA_VANTAGE_KEY = "HD9BEUEF8M9632YY"
 
+# Mapping des noms d'entreprises vers leurs tickers (recherche instantanée)
+NAME_TO_TICKER = {
+    # Actions US
+    "apple": "AAPL",
+    "tesla": "TSLA",
+    "microsoft": "MSFT",
+    "nvidia": "NVDA",
+    "google": "GOOGL",
+    "amazon": "AMZN",
+    "meta": "META",
+    "facebook": "META",
+    "netflix": "NFLX",
+    "disney": "DIS",
+    "coca cola": "KO",
+    "pepsi": "PEP",
+    "mcdonald": "MCD",
+    "starbucks": "SBUX",
+    "nike": "NKE",
+    # Actions Européennes
+    "bnp paribas": "BNP.PA",
+    "bnp": "BNP.PA",
+    "sap": "SAP.DE",
+    "lvmh": "MC.PA",
+    "l'oréal": "OR.PA",
+    "loreal": "OR.PA",
+    "airbus": "AIR.PA",
+    "renault": "RNO.PA",
+    "total": "TTE.PA",
+    "orange": "ORA.PA",
+    # Actions spécifiques
+    "iris energy": "IREN",
+    "iren": "IREN",
+    "droneshield": "DRO",
+    "drone shield": "DRO",
+}
+
 TICKER_ALIAS = {
     "IREN": "IREN",
     "BNP": "BNP.PA",
-    "AI": "AI.PA",
-    "OR": "OR.PA",
     "SAP": "SAP.DE",
-    "BMW": "BMW.DE",
 }
 
 ISIN_TO_TICKER = {
@@ -334,19 +330,31 @@ ISIN_TO_TICKER = {
     "US30303M1027": "META",
     "CA44812H1091": "IREN",
     "FR0000130008": "BNP.PA",
-    "FR0000120271": "AI.PA",
-    "FR0000120628": "OR.PA",
     "DE0007164600": "SAP.DE",
 }
 
 # ══════════════════════════════════════════════════════════════════════════════
-# FONCTIONS
+# FONCTIONS DE RECHERCHE
 # ══════════════════════════════════════════════════════════════════════════════
 def isin_to_ticker(isin):
     isin = isin.upper().strip()
     return ISIN_TO_TICKER.get(isin)
 
 def search_by_name(query):
+    """Recherche un ticker à partir du nom d'une entreprise"""
+    query_lower = query.lower().strip()
+    
+    # 1. Vérifier dans le mapping manuel
+    if query_lower in NAME_TO_TICKER:
+        symbol = NAME_TO_TICKER[query_lower]
+        return [{"symbol": symbol, "name": query.title()}]
+    
+    # 2. Recherche partielle dans le mapping
+    for name, symbol in NAME_TO_TICKER.items():
+        if query_lower in name or name in query_lower:
+            return [{"symbol": symbol, "name": name.title()}]
+    
+    # 3. Tentative avec Alpha Vantage
     try:
         url = f"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={query}&apikey={ALPHA_VANTAGE_KEY}"
         response = requests.get(url, timeout=10)
@@ -357,12 +365,22 @@ def search_by_name(query):
                 for match in data["bestMatches"][:5]:
                     symbol = match.get("1. symbol", "")
                     name = match.get("2. name", "")
-                    if symbol and symbol not in [m["symbol"] for m in matches]:
+                    if symbol and len(symbol) < 10:
                         matches.append({"symbol": symbol, "name": name[:40]})
                 return matches
     except:
         pass
+    
     return []
+
+def get_suggestions(query):
+    """Propose des suggestions basées sur le mapping"""
+    query_lower = query.lower().strip()
+    suggestions = []
+    for name, symbol in NAME_TO_TICKER.items():
+        if query_lower in name:
+            suggestions.append({"symbol": symbol, "name": name.title()})
+    return suggestions[:5]
 
 @st.cache_data(ttl=60, show_spinner=False)
 def get_stock_data(symbol):
@@ -426,8 +444,6 @@ st.markdown("""
 st.markdown('<p style="text-align: center; color: #7C4DFF; font-size: 13px; margin-bottom: 5px;">🔍 TYPE DE RECHERCHE</p>', unsafe_allow_html=True)
 search_type = st.radio("", ["📊 SYMBOLE", "🔢 ISIN", "🔍 NOM"], horizontal=True, label_visibility="collapsed")
 
-query = ""
-
 if search_type == "📊 SYMBOLE":
     st.markdown('<p style="color: #7C4DFF; font-size: 12px; margin-bottom: 5px;">Entrez un symbole boursier</p>', unsafe_allow_html=True)
     query = st.text_input("", value="AAPL", placeholder="Ex: AAPL, TSLA, MSFT, NVDA, IREN", label_visibility="collapsed")
@@ -447,25 +463,37 @@ elif search_type == "🔢 ISIN":
 
 elif search_type == "🔍 NOM":
     st.markdown('<p style="color: #7C4DFF; font-size: 12px; margin-bottom: 5px;">Entrez le nom d\'une entreprise</p>', unsafe_allow_html=True)
-    name_input = st.text_input("", placeholder="Ex: Apple, Tesla, BNP Paribas", label_visibility="collapsed")
+    name_input = st.text_input("", placeholder="Ex: Apple, Tesla, Iris Energy, Droneshield", label_visibility="collapsed")
+    
     if name_input:
         with st.spinner("Recherche..."):
             matches = search_by_name(name_input)
         
         if matches:
             st.markdown("### 📋 RÉSULTATS :")
-            cols = st.columns(min(4, len(matches)))
+            cols = st.columns(min(3, len(matches)))
             for i, match in enumerate(matches):
-                with cols[i % 4]:
+                with cols[i % 3]:
                     if st.button(f"🔹 {match['symbol']}", key=f"btn_{match['symbol']}", use_container_width=True):
                         st.session_state.selected_symbol = match['symbol']
                         st.session_state.analyze_clicked = True
                         st.rerun()
-            
             for match in matches:
                 st.caption(f"📌 {match['symbol']} - {match['name']}")
-        elif name_input:
-            st.info("🔍 Aucun résultat. Essayez un autre nom.")
+        else:
+            st.warning("🔍 Aucun résultat. Essayez : Apple, Tesla, Iris Energy, BNP Paribas")
+            
+            # Suggestions basées sur la saisie
+            suggestions = get_suggestions(name_input)
+            if suggestions:
+                st.markdown("### 💡 Suggestions :")
+                sug_cols = st.columns(min(3, len(suggestions)))
+                for i, sug in enumerate(suggestions):
+                    with sug_cols[i % 3]:
+                        if st.button(f"🔹 {sug['symbol']}", key=f"sug_{sug['symbol']}", use_container_width=True):
+                            st.session_state.selected_symbol = sug['symbol']
+                            st.session_state.analyze_clicked = True
+                            st.rerun()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # BOUTON D'ANALYSE
@@ -492,14 +520,13 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
         
         if data is None or data.empty:
             st.error(f"❌ Données non trouvées pour {st.session_state.selected_symbol}")
-            st.info("💡 Essayez : AAPL, TSLA, MSFT, NVDA, GOOGL, META, AMZN, IREN")
+            st.info("💡 Essayez : AAPL, TSLA, MSFT, NVDA, IREN, BNP.PA")
             st.session_state.analyze_clicked = False
         else:
             current_price = data['Close'].iloc[-1]
             prev_price = data['Close'].iloc[-2] if len(data) > 1 else current_price
             change = ((current_price - prev_price) / prev_price) * 100
             
-            # Badges
             st.markdown(f"""
             <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin: 10px 0;">
                 <span class="model-badge">🧠 LSTM ACTIVÉ</span>
@@ -508,7 +535,6 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             </div>
             """, unsafe_allow_html=True)
             
-            # Prix actuel
             company_name = info.get('longName', symbol)
             st.markdown(f"""
             <div class="metric-card" style="margin: 10px 0;">
@@ -520,83 +546,34 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             </div>
             """, unsafe_allow_html=True)
             
-            # Légende des courbes
+            # Graphique
             st.markdown("""
             <div class="legend-box">
                 <div class="legend-item">
                     <div class="legend-color-area" style="background: rgba(124,77,255,0.3);"></div>
-                    <span><strong style="color:#7C4DFF">● Prix</strong> — Cours de clôture quotidien</span>
+                    <span><strong style="color:#7C4DFF">● Prix</strong> — Cours de clôture</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color-line" style="background: #00D4AA;"></div>
-                    <span><strong style="color:#00D4AA">MA20</strong> — Moyenne mobile 20 jours (tendance court terme)</span>
+                    <span><strong style="color:#00D4AA">MA20</strong> — Moyenne 20j (court terme)</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color-line" style="background: #FFB74D;"></div>
-                    <span><strong style="color:#FFB74D">MA50</strong> — Moyenne mobile 50 jours (tendance moyen terme)</span>
+                    <span><strong style="color:#FFB74D">MA50</strong> — Moyenne 50j (moyen terme)</span>
                 </div>
-            </div>
-            
-            <div style="background: rgba(124,77,255,0.05); border-radius: 8px; padding: 8px; margin: 5px 0 15px 0;">
-                <p style="color: #8A9AB0; font-size: 10px; margin: 0; text-align: center;">
-                📈 <strong>Comment lire le graphique ?</strong><br>
-                • Quand MA20 (verte) passe au-dessus de MA50 (orange) → signal haussier<br>
-                • Quand MA20 passe en dessous de MA50 → signal baissier<br>
-                • La zone violette sous la courbe représente le volume échangé
-                </p>
             </div>
             """, unsafe_allow_html=True)
             
-            # Graphique
             fig = go.Figure()
+            fig.add_trace(go.Scatter(x=data.index, y=data['Close'], line=dict(color='#7C4DFF', width=2.5), fill='tozeroy', fillcolor='rgba(124,77,255,0.1)', name='Prix'))
+            fig.add_trace(go.Scatter(x=data.index, y=data['Close'].rolling(20).mean(), line=dict(color='#00D4AA', width=1.5), name='MA20'))
+            fig.add_trace(go.Scatter(x=data.index, y=data['Close'].rolling(50).mean(), line=dict(color='#FFB74D', width=1.5), name='MA50'))
             
-            fig.add_trace(go.Scatter(
-                x=data.index,
-                y=data['Close'],
-                line=dict(color='#7C4DFF', width=2.5),
-                fill='tozeroy',
-                fillcolor='rgba(124,77,255,0.1)',
-                name='Prix de clôture'
-            ))
+            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', height=400, margin=dict(l=0, r=0, t=40, b=20))
+            fig.update_xaxes(showgrid=False, zeroline=False, color='#2A3050')
+            fig.update_yaxes(showgrid=True, gridcolor='#1A1E30', zeroline=False)
             
-            ma20 = data['Close'].rolling(20).mean()
-            fig.add_trace(go.Scatter(
-                x=data.index, 
-                y=ma20, 
-                line=dict(color='#00D4AA', width=1.5, dash='solid'), 
-                name='MA20 (moyenne 20 jours)'
-            ))
-            
-            ma50 = data['Close'].rolling(50).mean()
-            fig.add_trace(go.Scatter(
-                x=data.index, 
-                y=ma50, 
-                line=dict(color='#FFB74D', width=1.5, dash='dot'), 
-                name='MA50 (moyenne 50 jours)'
-            ))
-            
-            fig.update_layout(
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-                height=400,
-                margin=dict(l=0, r=0, t=40, b=20),
-                legend=dict(
-                    orientation='v',
-                    yanchor='top',
-                    y=0.99,
-                    xanchor='left',
-                    x=0.01,
-                    bgcolor='rgba(13,15,26,0.8)',
-                    bordercolor='#1E2340',
-                    borderwidth=1,
-                    font=dict(color='#8A9AB0', size=9)
-                ),
-                font=dict(color='#8A9AB0', size=10)
-            )
-            fig.update_xaxes(showgrid=False, zeroline=False, color='#2A3050', title='Date')
-            fig.update_yaxes(showgrid=True, gridcolor='#1A1E30', zeroline=False, title='Prix (USD)')
-            
-            config = {'displayModeBar': True, 'scrollZoom': False, 'staticPlot': False}
+            config = {'displayModeBar': True, 'scrollZoom': False}
             st.plotly_chart(fig, use_container_width=True, config=config)
             
             # Prédictions
@@ -608,82 +585,65 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             
             with col1:
                 pred = predictions["24H"]["price"]
-                fiab = predictions["24H"]["fiability"]
                 change_pct = ((pred - current_price) / current_price) * 100
                 st.markdown(f"""
                 <div class="pred-card">
                     <div class="pred-label">24 HEURES</div>
                     <div class="pred-price">${pred:.2f}</div>
                     <div class="{'pred-up' if change_pct >= 0 else 'pred-down'}">{change_pct:+.1f}%</div>
-                    <div class="fiability">🔒 Fiabilité : {fiab}%</div>
+                    <div class="fiability">🔒 Fiabilité : {predictions['24H']['fiability']}%</div>
                 </div>
                 """, unsafe_allow_html=True)
             
             with col2:
                 pred = predictions["7J"]["price"]
-                fiab = predictions["7J"]["fiability"]
                 change_pct = ((pred - current_price) / current_price) * 100
                 st.markdown(f"""
                 <div class="pred-card">
                     <div class="pred-label">7 JOURS</div>
                     <div class="pred-price">${pred:.2f}</div>
                     <div class="{'pred-up' if change_pct >= 0 else 'pred-down'}">{change_pct:+.1f}%</div>
-                    <div class="fiability">🔒 Fiabilité : {fiab}%</div>
+                    <div class="fiability">🔒 Fiabilité : {predictions['7J']['fiability']}%</div>
                 </div>
                 """, unsafe_allow_html=True)
             
             with col3:
                 pred = predictions["30J"]["price"]
-                fiab = predictions["30J"]["fiability"]
                 change_pct = ((pred - current_price) / current_price) * 100
                 st.markdown(f"""
                 <div class="pred-card">
                     <div class="pred-label">30 JOURS</div>
                     <div class="pred-price">${pred:.2f}</div>
                     <div class="{'pred-up' if change_pct >= 0 else 'pred-down'}">{change_pct:+.1f}%</div>
-                    <div class="fiability">🔒 Fiabilité : {fiab}%</div>
+                    <div class="fiability">🔒 Fiabilité : {predictions['30J']['fiability']}%</div>
                 </div>
                 """, unsafe_allow_html=True)
             
             with col4:
                 pred = predictions["6M"]["price"]
-                fiab = predictions["6M"]["fiability"]
                 change_pct = ((pred - current_price) / current_price) * 100
                 st.markdown(f"""
                 <div class="pred-card">
                     <div class="pred-label">6 MOIS</div>
                     <div class="pred-price">${pred:.2f}</div>
                     <div class="{'pred-up' if change_pct >= 0 else 'pred-down'}">{change_pct:+.1f}%</div>
-                    <div class="fiability">🔒 Fiabilité : {fiab}%</div>
+                    <div class="fiability">🔒 Fiabilité : {predictions['6M']['fiability']}%</div>
                 </div>
                 """, unsafe_allow_html=True)
             
-            # ========== MÉTRIQUES AVEC EXPLICATIONS ==========
-            st.markdown("<div class='section-title'>📊 MÉTRIQUES</div>", unsafe_allow_html=True)
-            
-            # Glossaire explicatif avant les métriques
-            with st.expander("📖 Comprendre les métriques (cliquez ici)", expanded=False):
+            # Métriques
+            with st.expander("📖 Comprendre les métriques", expanded=False):
                 st.markdown("""
                 <div class="glossary">
-                    <div class="glossary-title">🎯 DÉFINITIONS POUR DÉBUTANTS</div>
-                    <div class="glossary-item">
-                        <strong>🔵 DIRECTION</strong> — Pourcentage de fois où le modèle prédit correctement si le prix va monter ou baisser.<br>
-                        <span style="color: #7C4DFF;">Exemple: 60% signifie que sur 10 prédictions, 6 sont justes.</span>
-                    </div>
-                    <div class="glossary-item">
-                        <strong>🟣 VOLATILITÉ</strong> — Mesure l'amplitude des variations du prix. Plus c'est élevé, plus le cours bouge fortement.<br>
-                        <span style="color: #7C4DFF;">Exemple: 40% signifie que le prix peut varier de ±40% sur un an.</span>
-                    </div>
-                    <div class="glossary-item">
-                        <strong>🟢 SHARPE RATIO</strong> — Mesure le rendement par rapport au risque pris. Plus c'est élevé, meilleur est l'investissement.<br>
-                        <span style="color: #7C4DFF;">Exemple: 1.0 = bon, 0.5 = moyen, &lt;0 = mauvais.</span>
-                    </div>
-                    <div class="glossary-item">
-                        <strong>🟠 CONFIDENCE</strong> — Score global de fiabilité du modèle pour cette action (basé sur la volatilité et l'historique).<br>
-                        <span style="color: #7C4DFF;">Exemple: 85% signifie que le modèle est assez confiant dans ses prédictions.</span>
-                    </div>
+                    <div class="glossary-title">🎯 DÉFINITIONS</div>
+                    <div class="glossary-item"><strong>DIRECTION</strong> — Pourcentage de prédictions correctes (hausse/baisse)</div>
+                    <div class="glossary-item"><strong>VOLATILITÉ</strong> — Amplitude des variations du prix sur un an</div>
+                    <div class="glossary-item"><strong>SHARPE</strong> — Rendement obtenu par unité de risque prise</div>
+                    <div class="glossary-item"><strong>CONFIDENCE</strong> — Score global de fiabilité du modèle</div>
                 </div>
                 """, unsafe_allow_html=True)
+            
+            st.markdown("<div class='section-title'>📊 MÉTRIQUES</div>", unsafe_allow_html=True)
             
             col_a, col_b, col_c, col_d = st.columns(4)
             
@@ -692,7 +652,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             <div class="metric-card">
                 <div class="metric-title">🎯 DIRECTION</div>
                 <div class="metric-value" style="color: #00D4AA;">{dir_acc:.0f}%</div>
-                <div class="metric-explanation">Précision des prédictions de hausse/baisse</div>
+                <div class="metric-explanation">Précision des prédictions</div>
             </div>
             """, unsafe_allow_html=True)
             
@@ -700,7 +660,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             <div class="metric-card">
                 <div class="metric-title">⚡ VOLATILITÉ</div>
                 <div class="metric-value" style="color: #FFB74D;">{vol*100:.0f}%</div>
-                <div class="metric-explanation">Amplitude des variations du prix sur un an</div>
+                <div class="metric-explanation">Variation annuelle du prix</div>
             </div>
             """, unsafe_allow_html=True)
             
@@ -710,7 +670,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             <div class="metric-card">
                 <div class="metric-title">📈 SHARPE</div>
                 <div class="metric-value" style="color: {sharpe_color};">{sharpe:.2f}</div>
-                <div class="metric-explanation">Rendement gagné par unité de risque prise</div>
+                <div class="metric-explanation">Rendement / Risque</div>
             </div>
             """, unsafe_allow_html=True)
             
@@ -719,11 +679,10 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             <div class="metric-card">
                 <div class="metric-title">🔒 CONFIDENCE</div>
                 <div class="metric-value" style="color: #7C4DFF;">{confidence}%</div>
-                <div class="metric-explanation">Score global de fiabilité du modèle</div>
+                <div class="metric-explanation">Score global du modèle</div>
             </div>
             """, unsafe_allow_html=True)
             
-            # Disclaimer
             st.markdown("""
             <div class="disclaimer">
                 <p>⚠️ Prédictions basées sur LSTM + XGBoost. Ne constitue pas un conseil financier.</p>
