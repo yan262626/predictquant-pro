@@ -278,7 +278,7 @@ h1 {
 # ══════════════════════════════════════════════════════════════════════════════
 ALPHA_VANTAGE_KEY = "HD9BEUEF8M9632YY"
 
-# Mapping des noms d'entreprises vers leurs tickers (recherche instantanée)
+# Mapping des noms vers les tickers CORRECTS (NASDAQ)
 NAME_TO_TICKER = {
     # Actions US
     "apple": "AAPL",
@@ -288,7 +288,6 @@ NAME_TO_TICKER = {
     "google": "GOOGL",
     "amazon": "AMZN",
     "meta": "META",
-    "facebook": "META",
     "netflix": "NFLX",
     "disney": "DIS",
     "coca cola": "KO",
@@ -296,22 +295,21 @@ NAME_TO_TICKER = {
     "mcdonald": "MCD",
     "starbucks": "SBUX",
     "nike": "NKE",
+    "iris energy": "IREN",      # ✅ Iris Energy NASDAQ
+    "iren": "IREN",              # ✅ Iris Energy
+    "droneshield": "DRO",       # ✅ Droneshield
+    "drone shield": "DRO",
     # Actions Européennes
     "bnp paribas": "BNP.PA",
     "bnp": "BNP.PA",
     "sap": "SAP.DE",
     "lvmh": "MC.PA",
-    "l'oréal": "OR.PA",
+    "l'oreal": "OR.PA",
     "loreal": "OR.PA",
     "airbus": "AIR.PA",
     "renault": "RNO.PA",
     "total": "TTE.PA",
     "orange": "ORA.PA",
-    # Actions spécifiques
-    "iris energy": "IREN",
-    "iren": "IREN",
-    "droneshield": "DRO",
-    "drone shield": "DRO",
 }
 
 TICKER_ALIAS = {
@@ -334,27 +332,29 @@ ISIN_TO_TICKER = {
 }
 
 # ══════════════════════════════════════════════════════════════════════════════
-# FONCTIONS DE RECHERCHE
+# FONCTIONS
 # ══════════════════════════════════════════════════════════════════════════════
 def isin_to_ticker(isin):
     isin = isin.upper().strip()
     return ISIN_TO_TICKER.get(isin)
 
 def search_by_name(query):
-    """Recherche un ticker à partir du nom d'une entreprise"""
     query_lower = query.lower().strip()
     
-    # 1. Vérifier dans le mapping manuel
+    # Vérifier dans le mapping
     if query_lower in NAME_TO_TICKER:
         symbol = NAME_TO_TICKER[query_lower]
-        return [{"symbol": symbol, "name": query.title()}]
+        # Récupérer le vrai nom
+        real_name = "Iris Energy Ltd" if symbol == "IREN" else query.title()
+        return [{"symbol": symbol, "name": real_name}]
     
-    # 2. Recherche partielle dans le mapping
+    # Recherche partielle
     for name, symbol in NAME_TO_TICKER.items():
         if query_lower in name or name in query_lower:
-            return [{"symbol": symbol, "name": name.title()}]
+            real_name = "Iris Energy Ltd" if symbol == "IREN" else name.title()
+            return [{"symbol": symbol, "name": real_name}]
     
-    # 3. Tentative avec Alpha Vantage
+    # Alpha Vantage en dernier recours
     try:
         url = f"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={query}&apikey={ALPHA_VANTAGE_KEY}"
         response = requests.get(url, timeout=10)
@@ -373,27 +373,31 @@ def search_by_name(query):
     
     return []
 
-def get_suggestions(query):
-    """Propose des suggestions basées sur le mapping"""
-    query_lower = query.lower().strip()
-    suggestions = []
-    for name, symbol in NAME_TO_TICKER.items():
-        if query_lower in name:
-            suggestions.append({"symbol": symbol, "name": name.title()})
-    return suggestions[:5]
-
 @st.cache_data(ttl=60, show_spinner=False)
 def get_stock_data(symbol):
     try:
+        # Nettoyer le symbole
+        symbol = symbol.strip().upper()
+        
+        # Vérifier les alias
+        if symbol in TICKER_ALIAS:
+            symbol = TICKER_ALIAS[symbol]
+        
+        st.write(f"🔍 Recherche du symbole: {symbol}")  # Debug
+        
         ticker = yf.Ticker(symbol)
         time.sleep(0.5)
         data = ticker.history(period="1y")
-        if not data.empty:
-            info = ticker.info
-            return data, info
-    except:
-        pass
-    return None, None
+        
+        if data.empty:
+            st.write(f"⚠️ Pas de données pour {symbol}")
+            return None, None
+            
+        info = ticker.info
+        return data, info
+    except Exception as e:
+        st.write(f"❌ Erreur: {e}")
+        return None, None
 
 def calculate_predictions(data, current_price):
     returns = data['Close'].pct_change().dropna()
@@ -471,29 +475,13 @@ elif search_type == "🔍 NOM":
         
         if matches:
             st.markdown("### 📋 RÉSULTATS :")
-            cols = st.columns(min(3, len(matches)))
-            for i, match in enumerate(matches):
-                with cols[i % 3]:
-                    if st.button(f"🔹 {match['symbol']}", key=f"btn_{match['symbol']}", use_container_width=True):
-                        st.session_state.selected_symbol = match['symbol']
-                        st.session_state.analyze_clicked = True
-                        st.rerun()
             for match in matches:
-                st.caption(f"📌 {match['symbol']} - {match['name']}")
+                if st.button(f"🔹 {match['symbol']} - {match['name']}", key=f"btn_{match['symbol']}", use_container_width=True):
+                    st.session_state.selected_symbol = match['symbol']
+                    st.session_state.analyze_clicked = True
+                    st.rerun()
         else:
-            st.warning("🔍 Aucun résultat. Essayez : Apple, Tesla, Iris Energy, BNP Paribas")
-            
-            # Suggestions basées sur la saisie
-            suggestions = get_suggestions(name_input)
-            if suggestions:
-                st.markdown("### 💡 Suggestions :")
-                sug_cols = st.columns(min(3, len(suggestions)))
-                for i, sug in enumerate(suggestions):
-                    with sug_cols[i % 3]:
-                        if st.button(f"🔹 {sug['symbol']}", key=f"sug_{sug['symbol']}", use_container_width=True):
-                            st.session_state.selected_symbol = sug['symbol']
-                            st.session_state.analyze_clicked = True
-                            st.rerun()
+            st.warning("🔍 Aucun résultat. Essayez : Apple, Tesla, Iris Energy")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # BOUTON D'ANALYSE
@@ -520,7 +508,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
         
         if data is None or data.empty:
             st.error(f"❌ Données non trouvées pour {st.session_state.selected_symbol}")
-            st.info("💡 Essayez : AAPL, TSLA, MSFT, NVDA, IREN, BNP.PA")
+            st.info("💡 Essayez directement avec le symbole : IREN, AAPL, TSLA")
             st.session_state.analyze_clicked = False
         else:
             current_price = data['Close'].iloc[-1]
