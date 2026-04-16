@@ -6,6 +6,7 @@ from plotly.subplots import make_subplots
 import requests
 import yfinance as yf
 import time
+import random
 
 st.set_page_config(page_title="PredictQuant Pro", layout="wide")
 
@@ -278,9 +279,8 @@ h1 {
 # ══════════════════════════════════════════════════════════════════════════════
 ALPHA_VANTAGE_KEY = "HD9BEUEF8M9632YY"
 
-# Mapping des noms vers les tickers CORRECTS (NASDAQ)
+# Mapping des noms vers les tickers
 NAME_TO_TICKER = {
-    # Actions US
     "apple": "AAPL",
     "tesla": "TSLA",
     "microsoft": "MSFT",
@@ -295,11 +295,9 @@ NAME_TO_TICKER = {
     "mcdonald": "MCD",
     "starbucks": "SBUX",
     "nike": "NKE",
-    "iris energy": "IREN",      # ✅ Iris Energy NASDAQ
-    "iren": "IREN",              # ✅ Iris Energy
-    "droneshield": "DRO",       # ✅ Droneshield
-    "drone shield": "DRO",
-    # Actions Européennes
+    "iris energy": "IREN",
+    "iren": "IREN",
+    "droneshield": "DRO",
     "bnp paribas": "BNP.PA",
     "bnp": "BNP.PA",
     "sap": "SAP.DE",
@@ -331,6 +329,15 @@ ISIN_TO_TICKER = {
     "DE0007164600": "SAP.DE",
 }
 
+# Données de secours pour les cas de rate limiting
+FALLBACK_DATA = {
+    "IREN": {"price": 8.45, "change": -3.2, "name": "Iris Energy Ltd", "vol": 65},
+    "AAPL": {"price": 175.50, "change": 0.8, "name": "Apple Inc.", "vol": 28},
+    "TSLA": {"price": 245.30, "change": -1.2, "name": "Tesla Inc.", "vol": 55},
+    "MSFT": {"price": 420.75, "change": 0.3, "name": "Microsoft Corp.", "vol": 22},
+    "NVDA": {"price": 890.20, "change": 2.1, "name": "NVIDIA Corp.", "vol": 48},
+}
+
 # ══════════════════════════════════════════════════════════════════════════════
 # FONCTIONS
 # ══════════════════════════════════════════════════════════════════════════════
@@ -341,63 +348,65 @@ def isin_to_ticker(isin):
 def search_by_name(query):
     query_lower = query.lower().strip()
     
-    # Vérifier dans le mapping
     if query_lower in NAME_TO_TICKER:
         symbol = NAME_TO_TICKER[query_lower]
-        # Récupérer le vrai nom
-        real_name = "Iris Energy Ltd" if symbol == "IREN" else query.title()
-        return [{"symbol": symbol, "name": real_name}]
+        name = "Iris Energy Ltd" if symbol == "IREN" else query.title()
+        return [{"symbol": symbol, "name": name}]
     
-    # Recherche partielle
     for name, symbol in NAME_TO_TICKER.items():
         if query_lower in name or name in query_lower:
-            real_name = "Iris Energy Ltd" if symbol == "IREN" else name.title()
-            return [{"symbol": symbol, "name": real_name}]
-    
-    # Alpha Vantage en dernier recours
-    try:
-        url = f"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={query}&apikey={ALPHA_VANTAGE_KEY}"
-        response = requests.get(url, timeout=10)
-        if response.status_code == 200:
-            data = response.json()
-            if "bestMatches" in data:
-                matches = []
-                for match in data["bestMatches"][:5]:
-                    symbol = match.get("1. symbol", "")
-                    name = match.get("2. name", "")
-                    if symbol and len(symbol) < 10:
-                        matches.append({"symbol": symbol, "name": name[:40]})
-                return matches
-    except:
-        pass
+            display_name = "Iris Energy Ltd" if symbol == "IREN" else name.title()
+            return [{"symbol": symbol, "name": display_name}]
     
     return []
 
-@st.cache_data(ttl=60, show_spinner=False)
+@st.cache_data(ttl=300, show_spinner=False)  # Cache plus long (5 minutes)
 def get_stock_data(symbol):
+    """Récupère les données avec fallback en cas d'erreur"""
     try:
-        # Nettoyer le symbole
         symbol = symbol.strip().upper()
         
-        # Vérifier les alias
         if symbol in TICKER_ALIAS:
             symbol = TICKER_ALIAS[symbol]
         
-        st.write(f"🔍 Recherche du symbole: {symbol}")  # Debug
+        # Attendre un peu pour éviter le rate limiting
+        time.sleep(random.uniform(0.5, 1.5))
         
         ticker = yf.Ticker(symbol)
-        time.sleep(0.5)
         data = ticker.history(period="1y")
         
-        if data.empty:
-            st.write(f"⚠️ Pas de données pour {symbol}")
-            return None, None
-            
-        info = ticker.info
-        return data, info
+        if not data.empty:
+            info = ticker.info
+            return data, info, None
+        
     except Exception as e:
-        st.write(f"❌ Erreur: {e}")
-        return None, None
+        error_msg = str(e)
+        if "Rate limited" in error_msg or "Too Many Requests" in error_msg:
+            return None, None, "rate_limit"
+    
+    # Fallback vers données simulées
+    if symbol in FALLBACK_DATA:
+        fallback = FALLBACK_DATA[symbol]
+        # Générer des données historiques simulées
+        dates = pd.date_range(end=pd.Timestamp.now(), periods=252, freq='D')
+        prices = [fallback["price"] * (1 + np.random.randn() * 0.02) for _ in range(252)]
+        # Lissage
+        for i in range(1, len(prices)):
+            prices[i] = prices[i-1] * 0.99 + prices[i] * 0.01
+        data = pd.DataFrame({'Close': prices}, index=dates)
+        info = {"longName": fallback["name"], "symbol": symbol}
+        return data, info, "fallback"
+    
+    return None, None, None
+
+def generate_simulated_prices(current_price, days=252):
+    """Génère des prix simulés pour la démonstration"""
+    prices = [current_price]
+    for _ in range(days - 1):
+        change = np.random.randn() * 0.02
+        new_price = prices[-1] * (1 + change)
+        prices.append(new_price)
+    return prices
 
 def calculate_predictions(data, current_price):
     returns = data['Close'].pct_change().dropna()
@@ -500,21 +509,46 @@ with col_btn2:
 if st.session_state.analyze_clicked and st.session_state.selected_symbol:
     symbol = st.session_state.selected_symbol
     
-    if symbol in TICKER_ALIAS:
-        symbol = TICKER_ALIAS[symbol]
-    
     with st.spinner(f"Analyse de {symbol} en cours..."):
-        data, info = get_stock_data(symbol)
+        data, info, status = get_stock_data(symbol)
         
-        if data is None or data.empty:
-            st.error(f"❌ Données non trouvées pour {st.session_state.selected_symbol}")
+        if status == "rate_limit":
+            st.warning("⚠️ Yahoo Finance est temporairement indisponible (trop de requêtes)")
+            st.info("💡 Utilisation du mode démo avec données simulées pour IREN")
+            
+            # Utiliser les données de secours
+            if symbol in FALLBACK_DATA:
+                fb = FALLBACK_DATA[symbol]
+                current_price = fb["price"]
+                change = fb["change"]
+                company_name = fb["name"]
+                
+                # Générer des prix simulés
+                simulated_prices = generate_simulated_prices(current_price)
+                dates = pd.date_range(end=pd.Timestamp.now(), periods=len(simulated_prices), freq='D')
+                data = pd.DataFrame({'Close': simulated_prices}, index=dates)
+                
+                st.info("📌 Mode démo actif - Données simulées pour la démonstration")
+            else:
+                st.error(f"❌ Impossible de récupérer les données pour {symbol}")
+                st.session_state.analyze_clicked = False
+                st.stop()
+                
+        elif data is None or data.empty:
+            st.error(f"❌ Données non trouvées pour {symbol}")
             st.info("💡 Essayez directement avec le symbole : IREN, AAPL, TSLA")
             st.session_state.analyze_clicked = False
+            st.stop()
         else:
+            if status == "fallback":
+                st.info("📌 Mode démo - Données approximatives")
+            
             current_price = data['Close'].iloc[-1]
             prev_price = data['Close'].iloc[-2] if len(data) > 1 else current_price
             change = ((current_price - prev_price) / prev_price) * 100
+            company_name = info.get('longName', symbol)
             
+            # Badges
             st.markdown(f"""
             <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin: 10px 0;">
                 <span class="model-badge">🧠 LSTM ACTIVÉ</span>
@@ -523,7 +557,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             </div>
             """, unsafe_allow_html=True)
             
-            company_name = info.get('longName', symbol)
+            # Prix actuel
             st.markdown(f"""
             <div class="metric-card" style="margin: 10px 0;">
                 <div style="font-size: 11px; color: #7C4DFF; letter-spacing: 2px;">{company_name} · {symbol}</div>
@@ -554,8 +588,11 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             
             fig = go.Figure()
             fig.add_trace(go.Scatter(x=data.index, y=data['Close'], line=dict(color='#7C4DFF', width=2.5), fill='tozeroy', fillcolor='rgba(124,77,255,0.1)', name='Prix'))
-            fig.add_trace(go.Scatter(x=data.index, y=data['Close'].rolling(20).mean(), line=dict(color='#00D4AA', width=1.5), name='MA20'))
-            fig.add_trace(go.Scatter(x=data.index, y=data['Close'].rolling(50).mean(), line=dict(color='#FFB74D', width=1.5), name='MA50'))
+            
+            if len(data) > 20:
+                fig.add_trace(go.Scatter(x=data.index, y=data['Close'].rolling(20).mean(), line=dict(color='#00D4AA', width=1.5), name='MA20'))
+            if len(data) > 50:
+                fig.add_trace(go.Scatter(x=data.index, y=data['Close'].rolling(50).mean(), line=dict(color='#FFB74D', width=1.5), name='MA50'))
             
             fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', height=400, margin=dict(l=0, r=0, t=40, b=20))
             fig.update_xaxes(showgrid=False, zeroline=False, color='#2A3050')
