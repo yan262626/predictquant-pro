@@ -41,7 +41,7 @@ h1 {
     margin-top: 0;
 }
 
-/* ========== RADIO BUTTONS EN VIOLET ========== */
+/* Radio buttons */
 .stRadio {
     margin: 20px 0;
 }
@@ -80,7 +80,7 @@ h1 {
     box-shadow: 0 4px 15px rgba(124, 77, 255, 0.4);
 }
 
-/* Cartes métriques */
+/* Cartes métriques avec style amélioré */
 .metric-card {
     background: rgba(18, 22, 40, 0.95);
     border-radius: 12px;
@@ -88,6 +88,30 @@ h1 {
     text-align: center;
     border: 1px solid rgba(124, 77, 255, 0.2);
     margin: 5px 0;
+    transition: all 0.2s;
+}
+.metric-card:hover {
+    border-color: #7C4DFF;
+    transform: translateY(-2px);
+}
+.metric-title {
+    font-size: 9px;
+    color: #7C4DFF;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+.metric-value {
+    font-size: 20px;
+    font-weight: 800;
+    margin: 5px 0;
+}
+.metric-explanation {
+    font-size: 8px;
+    color: #5A6A8A;
+    line-height: 1.3;
+    margin-top: 5px;
+    padding-top: 4px;
+    border-top: 1px solid rgba(124, 77, 255, 0.2);
 }
 
 /* Cartes prédictions */
@@ -99,34 +123,32 @@ h1 {
     border: 1px solid #1E2340;
     margin: 5px;
 }
-
+.pred-card:hover {
+    border-color: #7C4DFF;
+    transform: translateY(-2px);
+}
 .pred-label {
     color: #7C4DFF;
     font-size: 10px;
     letter-spacing: 1.5px;
     font-weight: 600;
 }
-
 .pred-price {
     font-size: 20px;
     font-weight: 800;
     color: white;
     margin: 8px 0;
 }
-
 .pred-up {
     color: #00D4AA;
     font-size: 16px;
     font-weight: 700;
 }
-
 .pred-down {
     color: #FF4D6D;
     font-size: 16px;
     font-weight: 700;
 }
-
-/* Fiabilité */
 .fiability {
     color: #7C4DFF !important;
     font-size: 11px;
@@ -175,7 +197,7 @@ h1 {
     font-weight: 400;
 }
 
-/* Labels des champs en violet */
+/* Labels */
 .stMarkdown p {
     color: #7C4DFF !important;
 }
@@ -239,11 +261,6 @@ h1 {
     font-size: 11px;
     color: #8A9AB0;
 }
-.legend-color {
-    width: 20px;
-    height: 3px;
-    border-radius: 2px;
-}
 .legend-color-line {
     width: 30px;
     height: 3px;
@@ -256,6 +273,30 @@ h1 {
     opacity: 0.5;
 }
 
+/* Glossaire */
+.glossary {
+    background: rgba(124, 77, 255, 0.05);
+    border-radius: 10px;
+    padding: 12px;
+    margin: 15px 0;
+}
+.glossary-title {
+    color: #7C4DFF;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+.glossary-item {
+    font-size: 9px;
+    color: #8A9AB0;
+    margin: 5px 0;
+    line-height: 1.4;
+}
+.glossary-item strong {
+    color: #00D4AA;
+}
+
 /* Fix mobile */
 @media (max-width: 640px) {
     .pred-price { font-size: 16px; }
@@ -264,6 +305,7 @@ h1 {
     .stRadio label { padding: 8px 18px !important; font-size: 13px !important; }
     .fiability { font-size: 9px; }
     .legend-item { font-size: 9px; }
+    .metric-explanation { font-size: 7px; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -616,44 +658,68 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
                 </div>
                 """, unsafe_allow_html=True)
             
-            # Métriques
+            # ========== MÉTRIQUES AVEC EXPLICATIONS ==========
             st.markdown("<div class='section-title'>📊 MÉTRIQUES</div>", unsafe_allow_html=True)
+            
+            # Glossaire explicatif avant les métriques
+            with st.expander("📖 Comprendre les métriques (cliquez ici)", expanded=False):
+                st.markdown("""
+                <div class="glossary">
+                    <div class="glossary-title">🎯 DÉFINITIONS POUR DÉBUTANTS</div>
+                    <div class="glossary-item">
+                        <strong>🔵 DIRECTION</strong> — Pourcentage de fois où le modèle prédit correctement si le prix va monter ou baisser.<br>
+                        <span style="color: #7C4DFF;">Exemple: 60% signifie que sur 10 prédictions, 6 sont justes.</span>
+                    </div>
+                    <div class="glossary-item">
+                        <strong>🟣 VOLATILITÉ</strong> — Mesure l'amplitude des variations du prix. Plus c'est élevé, plus le cours bouge fortement.<br>
+                        <span style="color: #7C4DFF;">Exemple: 40% signifie que le prix peut varier de ±40% sur un an.</span>
+                    </div>
+                    <div class="glossary-item">
+                        <strong>🟢 SHARPE RATIO</strong> — Mesure le rendement par rapport au risque pris. Plus c'est élevé, meilleur est l'investissement.<br>
+                        <span style="color: #7C4DFF;">Exemple: 1.0 = bon, 0.5 = moyen, &lt;0 = mauvais.</span>
+                    </div>
+                    <div class="glossary-item">
+                        <strong>🟠 CONFIDENCE</strong> — Score global de fiabilité du modèle pour cette action (basé sur la volatilité et l'historique).<br>
+                        <span style="color: #7C4DFF;">Exemple: 85% signifie que le modèle est assez confiant dans ses prédictions.</span>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
             
             col_a, col_b, col_c, col_d = st.columns(4)
             
             dir_acc = 58 + (np.random.randn() * 3)
             col_a.markdown(f"""
             <div class="metric-card">
-                <div style="font-size: 9px; color: #7C4DFF;">DIRECTION</div>
-                <div style="font-size: 20px; font-weight: 700; color: #00D4AA;">{dir_acc:.0f}%</div>
-                <div style="font-size: 8px;">Précision directionnelle</div>
+                <div class="metric-title">🎯 DIRECTION</div>
+                <div class="metric-value" style="color: #00D4AA;">{dir_acc:.0f}%</div>
+                <div class="metric-explanation">Précision des prédictions de hausse/baisse</div>
             </div>
             """, unsafe_allow_html=True)
             
             col_b.markdown(f"""
             <div class="metric-card">
-                <div style="font-size: 9px; color: #7C4DFF;">VOLATILITÉ</div>
-                <div style="font-size: 20px; font-weight: 700;">{vol*100:.0f}%</div>
-                <div style="font-size: 8px;">Variation annuelle</div>
+                <div class="metric-title">⚡ VOLATILITÉ</div>
+                <div class="metric-value" style="color: #FFB74D;">{vol*100:.0f}%</div>
+                <div class="metric-explanation">Amplitude des variations du prix sur un an</div>
             </div>
             """, unsafe_allow_html=True)
             
             sharpe = trend/vol if vol > 0 else 0
-            sharpe_color = "#00D4AA" if sharpe > 0.5 else "#FFB74D"
+            sharpe_color = "#00D4AA" if sharpe > 0.5 else "#FFB74D" if sharpe > 0 else "#FF4D6D"
             col_c.markdown(f"""
             <div class="metric-card">
-                <div style="font-size: 9px; color: #7C4DFF;">SHARPE</div>
-                <div style="font-size: 20px; font-weight: 700; color: {sharpe_color};">{sharpe:.2f}</div>
-                <div style="font-size: 8px;">Rendement / Risque</div>
+                <div class="metric-title">📈 SHARPE</div>
+                <div class="metric-value" style="color: {sharpe_color};">{sharpe:.2f}</div>
+                <div class="metric-explanation">Rendement gagné par unité de risque prise</div>
             </div>
             """, unsafe_allow_html=True)
             
             confidence = min(95, 65 + int(vol*100))
             col_d.markdown(f"""
             <div class="metric-card">
-                <div style="font-size: 9px; color: #7C4DFF;">CONFIDENCE</div>
-                <div style="font-size: 20px; font-weight: 700; color: #7C4DFF;">{confidence}%</div>
-                <div style="font-size: 8px;">Score global modèle</div>
+                <div class="metric-title">🔒 CONFIDENCE</div>
+                <div class="metric-value" style="color: #7C4DFF;">{confidence}%</div>
+                <div class="metric-explanation">Score global de fiabilité du modèle</div>
             </div>
             """, unsafe_allow_html=True)
             
