@@ -41,7 +41,7 @@ h1 {
     margin-top: 0;
 }
 
-/* Radio buttons */
+/* Radio buttons en orange */
 .stRadio {
     margin: 20px 0;
 }
@@ -55,8 +55,8 @@ h1 {
     background: #0D0F1A !important;
     padding: 12px 28px !important;
     border-radius: 50px !important;
-    border: 2px solid #2A3050 !important;
-    color: #E8EAF0 !important;
+    border: 2px solid #FF914D !important;
+    color: #FF914D !important;
     font-size: 16px !important;
     font-weight: 700 !important;
     letter-spacing: 1px !important;
@@ -67,6 +67,7 @@ h1 {
 .stRadio label:hover {
     border-color: #7C4DFF !important;
     background: rgba(124, 77, 255, 0.1) !important;
+    color: #7C4DFF !important;
     transform: translateY(-2px);
 }
 .stRadio div[data-baseweb="radio"] {
@@ -125,7 +126,7 @@ h1 {
     font-weight: 700;
 }
 
-/* FIABILITÉ EN ORANGE */
+/* Fiabilité en orange */
 .fiability {
     color: #FF914D !important;
     font-size: 11px;
@@ -174,6 +175,11 @@ h1 {
     font-weight: 400;
 }
 
+/* Labels en orange */
+.stMarkdown p {
+    color: #FF914D !important;
+}
+
 /* Button */
 .stButton > button {
     background: linear-gradient(90deg, #7C4DFF 0%, #00D4AA 100%) !important;
@@ -214,6 +220,42 @@ h1 {
     color: white;
 }
 
+/* Légende du graphique */
+.legend-box {
+    background: #0D0F1A;
+    border: 1px solid #1E2340;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: #8A9AB0;
+}
+.legend-color {
+    width: 20px;
+    height: 3px;
+    border-radius: 2px;
+}
+.legend-color-line {
+    width: 30px;
+    height: 3px;
+    border-radius: 2px;
+}
+.legend-color-area {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    opacity: 0.5;
+}
+
 /* Fix mobile */
 @media (max-width: 640px) {
     .pred-price { font-size: 16px; }
@@ -221,6 +263,7 @@ h1 {
     .pred-card { padding: 8px 4px; }
     .stRadio label { padding: 8px 18px !important; font-size: 13px !important; }
     .fiability { font-size: 9px; }
+    .legend-item { font-size: 9px; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -230,7 +273,6 @@ h1 {
 # ══════════════════════════════════════════════════════════════════════════════
 ALPHA_VANTAGE_KEY = "HD9BEUEF8M9632YY"
 
-# Tickers alternatifs
 TICKER_ALIAS = {
     "IREN": "IREN",
     "BNP": "BNP.PA",
@@ -240,7 +282,6 @@ TICKER_ALIAS = {
     "BMW": "BMW.DE",
 }
 
-# Base ISIN → Ticker
 ISIN_TO_TICKER = {
     "US0378331005": "AAPL",
     "US88160R1014": "TSLA",
@@ -307,7 +348,6 @@ def calculate_predictions(data, current_price):
     pred_30d = current_price * (1 + trend/12 + vol * 0.15 + momentum_20 * 0.2)
     pred_6m = current_price * (1 + trend/2 + vol * 0.25 + momentum_20 * 0.15)
     
-    # Calcul de la fiabilité (inverse de la volatilité + horizon)
     fiability_24h = max(5, min(95, int(100 - vol * 100 * 0.3)))
     fiability_7d = max(5, min(90, int(100 - vol * 100 * 0.5)))
     fiability_30d = max(5, min(85, int(100 - vol * 100 * 0.7)))
@@ -346,14 +386,12 @@ search_type = st.radio("", ["📊 SYMBOLE", "🔢 ISIN", "🔍 NOM"], horizontal
 
 query = ""
 
-# ─────────────── MODE SYMBOLE ───────────────
 if search_type == "📊 SYMBOLE":
     st.markdown('<p style="color: #FF914D; font-size: 12px; margin-bottom: 5px;">Entrez un symbole boursier</p>', unsafe_allow_html=True)
     query = st.text_input("", value="AAPL", placeholder="Ex: AAPL, TSLA, MSFT, NVDA, IREN", label_visibility="collapsed")
     if query:
         st.session_state.selected_symbol = query.upper()
 
-# ─────────────── MODE ISIN ───────────────
 elif search_type == "🔢 ISIN":
     st.markdown('<p style="color: #FF914D; font-size: 12px; margin-bottom: 5px;">Entrez un code ISIN (12 caractères)</p>', unsafe_allow_html=True)
     isin_input = st.text_input("", placeholder="Ex: US0378331005 pour Apple", label_visibility="collapsed")
@@ -365,7 +403,6 @@ elif search_type == "🔢 ISIN":
         else:
             st.warning("⚠️ ISIN non reconnu")
 
-# ─────────────── MODE NOM ───────────────
 elif search_type == "🔍 NOM":
     st.markdown('<p style="color: #FF914D; font-size: 12px; margin-bottom: 5px;">Entrez le nom d\'une entreprise</p>', unsafe_allow_html=True)
     name_input = st.text_input("", placeholder="Ex: Apple, Tesla, BNP Paribas", label_visibility="collapsed")
@@ -441,34 +478,86 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             </div>
             """, unsafe_allow_html=True)
             
-            # Graphique SANS ZOOM
+            # ========== LÉGENDE DÉTAILLÉE DES COURBES ==========
+            st.markdown("""
+            <div class="legend-box">
+                <div class="legend-item">
+                    <div class="legend-color-area" style="background: rgba(124,77,255,0.3);"></div>
+                    <span><strong style="color:#7C4DFF">● Prix</strong> — Cours de clôture quotidien</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color-line" style="background: #00D4AA;"></div>
+                    <span><strong style="color:#00D4AA">MA20</strong> — Moyenne mobile 20 jours (tendance court terme)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color-line" style="background: #FFB74D;"></div>
+                    <span><strong style="color:#FFB74D">MA50</strong> — Moyenne mobile 50 jours (tendance moyen terme)</span>
+                </div>
+            </div>
+            
+            <div style="background: rgba(124,77,255,0.05); border-radius: 8px; padding: 8px; margin: 5px 0 15px 0;">
+                <p style="color: #8A9AB0; font-size: 10px; margin: 0; text-align: center;">
+                📈 <strong>Comment lire le graphique ?</strong><br>
+                • Quand MA20 (verte) passe au-dessus de MA50 (orange) → signal haussier<br>
+                • Quand MA20 passe en dessous de MA50 → signal baissier<br>
+                • La zone violette sous la courbe représente le volume échangé
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Graphique SANS ZOOM avec légende améliorée
             fig = go.Figure()
+            
+            # Courbe des prix
             fig.add_trace(go.Scatter(
                 x=data.index,
                 y=data['Close'],
-                line=dict(color='#7C4DFF', width=2),
+                line=dict(color='#7C4DFF', width=2.5),
                 fill='tozeroy',
                 fillcolor='rgba(124,77,255,0.1)',
-                name='Prix'
+                name='Prix de clôture'
             ))
             
+            # MA20
             ma20 = data['Close'].rolling(20).mean()
+            fig.add_trace(go.Scatter(
+                x=data.index, 
+                y=ma20, 
+                line=dict(color='#00D4AA', width=1.5, dash='solid'), 
+                name='MA20 (moyenne 20 jours)'
+            ))
+            
+            # MA50
             ma50 = data['Close'].rolling(50).mean()
-            fig.add_trace(go.Scatter(x=data.index, y=ma20, line=dict(color='#00D4AA', width=1.5), name='MA20'))
-            fig.add_trace(go.Scatter(x=data.index, y=ma50, line=dict(color='#FFB74D', width=1.5), name='MA50'))
+            fig.add_trace(go.Scatter(
+                x=data.index, 
+                y=ma50, 
+                line=dict(color='#FFB74D', width=1.5, dash='dot'), 
+                name='MA50 (moyenne 50 jours)'
+            ))
             
             fig.update_layout(
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)',
-                height=350,
-                margin=dict(l=0, r=0, t=20, b=20),
-                legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='center', x=0.5),
+                height=400,
+                margin=dict(l=0, r=0, t=40, b=20),
+                legend=dict(
+                    orientation='v',
+                    yanchor='top',
+                    y=0.99,
+                    xanchor='left',
+                    x=0.01,
+                    bgcolor='rgba(13,15,26,0.8)',
+                    bordercolor='#1E2340',
+                    borderwidth=1,
+                    font=dict(color='#8A9AB0', size=9)
+                ),
                 font=dict(color='#8A9AB0', size=10)
             )
-            fig.update_xaxes(showgrid=False, zeroline=False, color='#2A3050')
-            fig.update_yaxes(showgrid=True, gridcolor='#1A1E30', zeroline=False)
+            fig.update_xaxes(showgrid=False, zeroline=False, color='#2A3050', title='Date')
+            fig.update_yaxes(showgrid=True, gridcolor='#1A1E30', zeroline=False, title='Prix (USD)')
             
-            # DÉSACTIVATION DU ZOOM
+            # Désactivation du zoom
             config = {'displayModeBar': True, 'scrollZoom': False, 'staticPlot': False}
             st.plotly_chart(fig, use_container_width=True, config=config)
             
@@ -541,6 +630,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             <div class="metric-card">
                 <div style="font-size: 9px; color: #FF914D;">DIRECTION</div>
                 <div style="font-size: 20px; font-weight: 700; color: #00D4AA;">{dir_acc:.0f}%</div>
+                <div style="font-size: 8px;">Précision directionnelle</div>
             </div>
             """, unsafe_allow_html=True)
             
@@ -548,6 +638,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             <div class="metric-card">
                 <div style="font-size: 9px; color: #FF914D;">VOLATILITÉ</div>
                 <div style="font-size: 20px; font-weight: 700;">{vol*100:.0f}%</div>
+                <div style="font-size: 8px;">Variation annuelle</div>
             </div>
             """, unsafe_allow_html=True)
             
@@ -557,6 +648,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             <div class="metric-card">
                 <div style="font-size: 9px; color: #FF914D;">SHARPE</div>
                 <div style="font-size: 20px; font-weight: 700; color: {sharpe_color};">{sharpe:.2f}</div>
+                <div style="font-size: 8px;">Rendement / Risque</div>
             </div>
             """, unsafe_allow_html=True)
             
@@ -565,6 +657,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             <div class="metric-card">
                 <div style="font-size: 9px; color: #FF914D;">CONFIDENCE</div>
                 <div style="font-size: 20px; font-weight: 700; color: #7C4DFF;">{confidence}%</div>
+                <div style="font-size: 8px;">Score global modèle</div>
             </div>
             """, unsafe_allow_html=True)
             
