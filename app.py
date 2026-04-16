@@ -22,7 +22,6 @@ st.markdown("""
     background: linear-gradient(135deg, #0A0E1A 0%, #0F1322 100%);
 }
 
-/* Header */
 h1 {
     text-align: center;
     background: linear-gradient(135deg, #FFFFFF 0%, #7C4DFF 50%, #00D4AA 100%);
@@ -41,46 +40,41 @@ h1 {
     margin-top: 0;
 }
 
-/* Radio buttons */
-.stRadio {
-    margin: 20px 0;
-}
-.stRadio > div {
+/* ========== SEGMENTED CONTROL STYLE ========== */
+.segmented-control {
     display: flex;
-    gap: 15px;
+    gap: 8px;
     justify-content: center;
-    flex-wrap: wrap;
+    margin: 20px 0;
+    background: #0D0F1A;
+    padding: 6px;
+    border-radius: 60px;
+    border: 1px solid #1E2340;
 }
-.stRadio label {
-    background: #0D0F1A !important;
-    padding: 12px 28px !important;
-    border-radius: 50px !important;
-    border: 2px solid #7C4DFF !important;
-    color: #7C4DFF !important;
-    font-size: 16px !important;
-    font-weight: 700 !important;
-    letter-spacing: 1px !important;
-    font-family: 'Inter', sans-serif !important;
-    transition: all 0.3s ease !important;
-    cursor: pointer !important;
+.segmented-btn {
+    padding: 10px 28px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: transparent;
+    color: #5A6A8A;
+    border: none;
 }
-.stRadio label:hover {
-    border-color: #00D4AA !important;
-    background: rgba(0, 212, 170, 0.1) !important;
-    color: #00D4AA !important;
-    transform: translateY(-2px);
+.segmented-btn.active {
+    background: linear-gradient(135deg, #7C4DFF 0%, #00D4AA 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(124, 77, 255, 0.3);
 }
-.stRadio div[data-baseweb="radio"] {
-    display: none;
-}
-.stRadio div[role="radiogroup"] > div:has(input:checked) label {
-    background: linear-gradient(135deg, #7C4DFF 0%, #00D4AA 100%) !important;
-    border-color: transparent !important;
-    color: white !important;
-    box-shadow: 0 4px 15px rgba(124, 77, 255, 0.4);
+.segmented-btn:not(.active):hover {
+    color: #7C4DFF;
+    background: rgba(124, 77, 255, 0.1);
 }
 
-/* Cartes métriques avec style amélioré */
+/* Cartes métriques */
 .metric-card {
     background: rgba(18, 22, 40, 0.95);
     border-radius: 12px;
@@ -122,6 +116,7 @@ h1 {
     text-align: center;
     border: 1px solid #1E2340;
     margin: 5px;
+    transition: all 0.2s;
 }
 .pred-card:hover {
     border-color: #7C4DFF;
@@ -154,7 +149,6 @@ h1 {
     font-size: 11px;
     font-weight: 600;
     margin-top: 6px;
-    letter-spacing: 0.5px;
 }
 
 /* Badges */
@@ -185,7 +179,7 @@ h1 {
     border-radius: 12px !important;
     color: white !important;
     font-size: 15px !important;
-    padding: 12px 18px !important;
+    padding: 14px 18px !important;
     font-weight: 500 !important;
 }
 .stTextInput > div > div > input:focus {
@@ -194,12 +188,6 @@ h1 {
 }
 .stTextInput > div > div > input::placeholder {
     color: #4A5070 !important;
-    font-weight: 400;
-}
-
-/* Labels */
-.stMarkdown p {
-    color: #7C4DFF !important;
 }
 
 /* Button */
@@ -207,7 +195,7 @@ h1 {
     background: linear-gradient(90deg, #7C4DFF 0%, #00D4AA 100%) !important;
     color: white !important;
     border-radius: 12px !important;
-    padding: 12px !important;
+    padding: 14px !important;
     font-weight: 700 !important;
     font-size: 16px !important;
     letter-spacing: 1px !important;
@@ -235,14 +223,14 @@ h1 {
     margin: 0;
 }
 
-/* Current price card */
+/* Current price */
 .current-price {
     font-size: 36px;
     font-weight: 800;
     color: white;
 }
 
-/* Légende du graphique */
+/* Légende graphique */
 .legend-box {
     background: #0D0F1A;
     border: 1px solid #1E2340;
@@ -271,6 +259,31 @@ h1 {
     height: 20px;
     border-radius: 4px;
     opacity: 0.5;
+}
+
+/* Suggestions */
+.suggestions-box {
+    background: rgba(124, 77, 255, 0.05);
+    border-radius: 12px;
+    padding: 12px;
+    margin: 15px 0;
+}
+.suggestion-chip {
+    display: inline-block;
+    background: #0D0F1A;
+    border: 1px solid #7C4DFF;
+    border-radius: 30px;
+    padding: 6px 14px;
+    margin: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #7C4DFF;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.suggestion-chip:hover {
+    background: #7C4DFF;
+    color: white;
 }
 
 /* Glossaire */
@@ -302,10 +315,9 @@ h1 {
     .pred-price { font-size: 16px; }
     .metric-card { padding: 8px; }
     .pred-card { padding: 8px 4px; }
-    .stRadio label { padding: 8px 18px !important; font-size: 13px !important; }
+    .segmented-btn { padding: 6px 16px; font-size: 11px; }
     .fiability { font-size: 9px; }
     .legend-item { font-size: 9px; }
-    .metric-explanation { font-size: 7px; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -315,6 +327,39 @@ h1 {
 # ══════════════════════════════════════════════════════════════════════════════
 ALPHA_VANTAGE_KEY = "HD9BEUEF8M9632YY"
 
+# Base de données de symboles connus (pour suggestions)
+POPULAR_SYMBOLS = {
+    "AAPL": "Apple Inc.",
+    "TSLA": "Tesla Inc.",
+    "MSFT": "Microsoft Corp.",
+    "NVDA": "NVIDIA Corp.",
+    "GOOGL": "Alphabet Inc.",
+    "AMZN": "Amazon.com Inc.",
+    "META": "Meta Platforms Inc.",
+    "IREN": "Iris Energy Ltd",
+    "BNP.PA": "BNP Paribas",
+    "SAP.DE": "SAP SE",
+    "DRO": "Droneshield Ltd",
+}
+
+# Mapping des noms courants vers tickers
+COMMON_NAMES = {
+    "apple": "AAPL",
+    "tesla": "TSLA",
+    "microsoft": "MSFT",
+    "nvidia": "NVDA",
+    "google": "GOOGL",
+    "amazon": "AMZN",
+    "meta": "META",
+    "facebook": "META",
+    "iris energy": "IREN",
+    "droneshield": "DRO",
+    "drone shield": "DRO",
+    "bnp": "BNP.PA",
+    "bnp paribas": "BNP.PA",
+    "sap": "SAP.DE",
+}
+
 TICKER_ALIAS = {
     "IREN": "IREN",
     "BNP": "BNP.PA",
@@ -322,6 +367,7 @@ TICKER_ALIAS = {
     "OR": "OR.PA",
     "SAP": "SAP.DE",
     "BMW": "BMW.DE",
+    "DRO": "DRO",
 }
 
 ISIN_TO_TICKER = {
@@ -347,6 +393,22 @@ def isin_to_ticker(isin):
     return ISIN_TO_TICKER.get(isin)
 
 def search_by_name(query):
+    query_lower = query.lower().strip()
+    
+    # Vérifier dans les noms communs
+    if query_lower in COMMON_NAMES:
+        return [{"symbol": COMMON_NAMES[query_lower], "name": POPULAR_SYMBOLS.get(COMMON_NAMES[query_lower], query)}]
+    
+    # Recherche dans la base populaire
+    results = []
+    for symbol, name in POPULAR_SYMBOLS.items():
+        if query_lower in name.lower() or query_lower in symbol.lower():
+            results.append({"symbol": symbol, "name": name})
+    
+    if results:
+        return results[:5]
+    
+    # API Alpha Vantage
     try:
         url = f"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={query}&apikey={ALPHA_VANTAGE_KEY}"
         response = requests.get(url, timeout=10)
@@ -358,11 +420,41 @@ def search_by_name(query):
                     symbol = match.get("1. symbol", "")
                     name = match.get("2. name", "")
                     if symbol and symbol not in [m["symbol"] for m in matches]:
-                        matches.append({"symbol": symbol, "name": name[:40]})
+                        matches.append({"symbol": symbol, "name": name[:50]})
                 return matches
     except:
         pass
     return []
+
+def get_suggestions(input_text):
+    """Suggère des symboles basés sur l'entrée utilisateur"""
+    if not input_text:
+        return []
+    input_lower = input_text.lower().strip()
+    suggestions = []
+    for symbol, name in POPULAR_SYMBOLS.items():
+        if input_lower in symbol.lower() or input_lower in name.lower():
+            suggestions.append({"symbol": symbol, "name": name})
+    return suggestions[:5]
+
+def smart_search(query):
+    """Recherche intelligente qui trouve le bon ticker même si l'utilisateur tape un nom"""
+    query_upper = query.upper().strip()
+    
+    # Déjà un symbole connu
+    if query_upper in POPULAR_SYMBOLS:
+        return query_upper
+    
+    # Vérifier les alias
+    if query_upper in TICKER_ALIAS:
+        return TICKER_ALIAS[query_upper]
+    
+    # Recherche par nom commun
+    query_lower = query.lower()
+    if query_lower in COMMON_NAMES:
+        return COMMON_NAMES[query_lower]
+    
+    return query_upper
 
 @st.cache_data(ttl=60, show_spinner=False)
 def get_stock_data(symbol):
@@ -409,6 +501,8 @@ if 'selected_symbol' not in st.session_state:
     st.session_state.selected_symbol = None
 if 'analyze_clicked' not in st.session_state:
     st.session_state.analyze_clicked = False
+if 'search_mode' not in st.session_state:
+    st.session_state.search_mode = "SYMBOLE"
 
 # ══════════════════════════════════════════════════════════════════════════════
 # HEADER
@@ -421,20 +515,44 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
-# RECHERCHE
+# SEGMENTED CONTROL POUR LA RECHERCHE
 # ══════════════════════════════════════════════════════════════════════════════
-st.markdown('<p style="text-align: center; color: #7C4DFF; font-size: 13px; margin-bottom: 5px;">🔍 TYPE DE RECHERCHE</p>', unsafe_allow_html=True)
-search_type = st.radio("", ["📊 SYMBOLE", "🔢 ISIN", "🔍 NOM"], horizontal=True, label_visibility="collapsed")
+st.markdown('<p style="text-align: center; color: #7C4DFF; font-size: 12px; margin-bottom: 10px;">🔍 TYPE DE RECHERCHE</p>', unsafe_allow_html=True)
 
+col_mode1, col_mode2, col_mode3 = st.columns(3)
+
+with col_mode1:
+    if st.button("📊 SYMBOLE", key="mode_symbol", use_container_width=True,
+                 type="primary" if st.session_state.search_mode == "SYMBOLE" else "secondary"):
+        st.session_state.search_mode = "SYMBOLE"
+        st.rerun()
+
+with col_mode2:
+    if st.button("🔢 ISIN", key="mode_isin", use_container_width=True,
+                 type="primary" if st.session_state.search_mode == "ISIN" else "secondary"):
+        st.session_state.search_mode = "ISIN"
+        st.rerun()
+
+with col_mode3:
+    if st.button("🔍 NOM", key="mode_name", use_container_width=True,
+                 type="primary" if st.session_state.search_mode == "NOM" else "secondary"):
+        st.session_state.search_mode = "NOM"
+        st.rerun()
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# RECHERCHE SELON LE MODE
+# ══════════════════════════════════════════════════════════════════════════════
 query = ""
 
-if search_type == "📊 SYMBOLE":
+if st.session_state.search_mode == "SYMBOLE":
     st.markdown('<p style="color: #7C4DFF; font-size: 12px; margin-bottom: 5px;">Entrez un symbole boursier</p>', unsafe_allow_html=True)
-    query = st.text_input("", value="AAPL", placeholder="Ex: AAPL, TSLA, MSFT, NVDA, IREN", label_visibility="collapsed")
+    query = st.text_input("", value="AAPL", placeholder="Ex: AAPL, TSLA, MSFT, NVDA, IREN, DRO", label_visibility="collapsed")
     if query:
-        st.session_state.selected_symbol = query.upper()
+        st.session_state.selected_symbol = smart_search(query)
 
-elif search_type == "🔢 ISIN":
+elif st.session_state.search_mode == "ISIN":
     st.markdown('<p style="color: #7C4DFF; font-size: 12px; margin-bottom: 5px;">Entrez un code ISIN (12 caractères)</p>', unsafe_allow_html=True)
     isin_input = st.text_input("", placeholder="Ex: US0378331005 pour Apple", label_visibility="collapsed")
     if isin_input:
@@ -445,27 +563,39 @@ elif search_type == "🔢 ISIN":
         else:
             st.warning("⚠️ ISIN non reconnu")
 
-elif search_type == "🔍 NOM":
+elif st.session_state.search_mode == "NOM":
     st.markdown('<p style="color: #7C4DFF; font-size: 12px; margin-bottom: 5px;">Entrez le nom d\'une entreprise</p>', unsafe_allow_html=True)
-    name_input = st.text_input("", placeholder="Ex: Apple, Tesla, BNP Paribas", label_visibility="collapsed")
+    name_input = st.text_input("", placeholder="Ex: Apple, Tesla, Droneshield", label_visibility="collapsed")
+    
     if name_input:
         with st.spinner("Recherche..."):
             matches = search_by_name(name_input)
         
         if matches:
             st.markdown("### 📋 RÉSULTATS :")
-            cols = st.columns(min(4, len(matches)))
+            cols = st.columns(min(3, len(matches)))
             for i, match in enumerate(matches):
-                with cols[i % 4]:
+                with cols[i % 3]:
                     if st.button(f"🔹 {match['symbol']}", key=f"btn_{match['symbol']}", use_container_width=True):
                         st.session_state.selected_symbol = match['symbol']
                         st.session_state.analyze_clicked = True
                         st.rerun()
-            
             for match in matches:
                 st.caption(f"📌 {match['symbol']} - {match['name']}")
         elif name_input:
             st.info("🔍 Aucun résultat. Essayez un autre nom.")
+            
+            # Suggestions
+            suggestions = get_suggestions(name_input)
+            if suggestions:
+                st.markdown("### 💡 Suggestions :")
+                chips_cols = st.columns(min(4, len(suggestions)))
+                for i, sug in enumerate(suggestions):
+                    with chips_cols[i % 4]:
+                        if st.button(f"{sug['symbol']}", key=f"sug_{sug['symbol']}"):
+                            st.session_state.selected_symbol = sug['symbol']
+                            st.session_state.analyze_clicked = True
+                            st.rerun()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # BOUTON D'ANALYSE
@@ -492,7 +622,18 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
         
         if data is None or data.empty:
             st.error(f"❌ Données non trouvées pour {st.session_state.selected_symbol}")
-            st.info("💡 Essayez : AAPL, TSLA, MSFT, NVDA, GOOGL, META, AMZN, IREN")
+            
+            # Proposer des alternatives
+            st.markdown("### 💡 Suggestions :")
+            alt_symbols = ["AAPL", "TSLA", "MSFT", "NVDA", "GOOGL", "META", "IREN", "DRO"]
+            chips = st.columns(min(4, len(alt_symbols)))
+            for i, alt in enumerate(alt_symbols):
+                with chips[i % 4]:
+                    if st.button(f"{alt}", key=f"alt_{alt}"):
+                        st.session_state.selected_symbol = alt
+                        st.session_state.analyze_clicked = True
+                        st.rerun()
+            
             st.session_state.analyze_clicked = False
         else:
             current_price = data['Close'].iloc[-1]
@@ -509,7 +650,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             """, unsafe_allow_html=True)
             
             # Prix actuel
-            company_name = info.get('longName', symbol)
+            company_name = info.get('longName', POPULAR_SYMBOLS.get(symbol, symbol))
             st.markdown(f"""
             <div class="metric-card" style="margin: 10px 0;">
                 <div style="font-size: 11px; color: #7C4DFF; letter-spacing: 2px;">{company_name} · {symbol}</div>
@@ -520,7 +661,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             </div>
             """, unsafe_allow_html=True)
             
-            # Légende des courbes
+            # Légende graphique
             st.markdown("""
             <div class="legend-box">
                 <div class="legend-item">
@@ -535,15 +676,6 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
                     <div class="legend-color-line" style="background: #FFB74D;"></div>
                     <span><strong style="color:#FFB74D">MA50</strong> — Moyenne mobile 50 jours (tendance moyen terme)</span>
                 </div>
-            </div>
-            
-            <div style="background: rgba(124,77,255,0.05); border-radius: 8px; padding: 8px; margin: 5px 0 15px 0;">
-                <p style="color: #8A9AB0; font-size: 10px; margin: 0; text-align: center;">
-                📈 <strong>Comment lire le graphique ?</strong><br>
-                • Quand MA20 (verte) passe au-dessus de MA50 (orange) → signal haussier<br>
-                • Quand MA20 passe en dessous de MA50 → signal baissier<br>
-                • La zone violette sous la courbe représente le volume échangé
-                </p>
             </div>
             """, unsafe_allow_html=True)
             
@@ -563,16 +695,16 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             fig.add_trace(go.Scatter(
                 x=data.index, 
                 y=ma20, 
-                line=dict(color='#00D4AA', width=1.5, dash='solid'), 
-                name='MA20 (moyenne 20 jours)'
+                line=dict(color='#00D4AA', width=1.5), 
+                name='MA20'
             ))
             
             ma50 = data['Close'].rolling(50).mean()
             fig.add_trace(go.Scatter(
                 x=data.index, 
                 y=ma50, 
-                line=dict(color='#FFB74D', width=1.5, dash='dot'), 
-                name='MA50 (moyenne 50 jours)'
+                line=dict(color='#FFB74D', width=1.5), 
+                name='MA50'
             ))
             
             fig.update_layout(
@@ -581,22 +713,15 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
                 height=400,
                 margin=dict(l=0, r=0, t=40, b=20),
                 legend=dict(
-                    orientation='v',
-                    yanchor='top',
-                    y=0.99,
-                    xanchor='left',
-                    x=0.01,
-                    bgcolor='rgba(13,15,26,0.8)',
-                    bordercolor='#1E2340',
-                    borderwidth=1,
+                    orientation='v', yanchor='top', y=0.99, xanchor='left', x=0.01,
+                    bgcolor='rgba(13,15,26,0.8)', bordercolor='#1E2340', borderwidth=1,
                     font=dict(color='#8A9AB0', size=9)
-                ),
-                font=dict(color='#8A9AB0', size=10)
+                )
             )
-            fig.update_xaxes(showgrid=False, zeroline=False, color='#2A3050', title='Date')
-            fig.update_yaxes(showgrid=True, gridcolor='#1A1E30', zeroline=False, title='Prix (USD)')
+            fig.update_xaxes(showgrid=False, zeroline=False, color='#2A3050')
+            fig.update_yaxes(showgrid=True, gridcolor='#1A1E30', zeroline=False)
             
-            config = {'displayModeBar': True, 'scrollZoom': False, 'staticPlot': False}
+            config = {'displayModeBar': True, 'scrollZoom': False}
             st.plotly_chart(fig, use_container_width=True, config=config)
             
             # Prédictions
@@ -658,32 +783,19 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
                 </div>
                 """, unsafe_allow_html=True)
             
-            # ========== MÉTRIQUES AVEC EXPLICATIONS ==========
-            st.markdown("<div class='section-title'>📊 MÉTRIQUES</div>", unsafe_allow_html=True)
-            
-            # Glossaire explicatif avant les métriques
-            with st.expander("📖 Comprendre les métriques (cliquez ici)", expanded=False):
+            # Métriques avec glossaire
+            with st.expander("📖 Comprendre les métriques", expanded=False):
                 st.markdown("""
                 <div class="glossary">
-                    <div class="glossary-title">🎯 DÉFINITIONS POUR DÉBUTANTS</div>
-                    <div class="glossary-item">
-                        <strong>🔵 DIRECTION</strong> — Pourcentage de fois où le modèle prédit correctement si le prix va monter ou baisser.<br>
-                        <span style="color: #7C4DFF;">Exemple: 60% signifie que sur 10 prédictions, 6 sont justes.</span>
-                    </div>
-                    <div class="glossary-item">
-                        <strong>🟣 VOLATILITÉ</strong> — Mesure l'amplitude des variations du prix. Plus c'est élevé, plus le cours bouge fortement.<br>
-                        <span style="color: #7C4DFF;">Exemple: 40% signifie que le prix peut varier de ±40% sur un an.</span>
-                    </div>
-                    <div class="glossary-item">
-                        <strong>🟢 SHARPE RATIO</strong> — Mesure le rendement par rapport au risque pris. Plus c'est élevé, meilleur est l'investissement.<br>
-                        <span style="color: #7C4DFF;">Exemple: 1.0 = bon, 0.5 = moyen, &lt;0 = mauvais.</span>
-                    </div>
-                    <div class="glossary-item">
-                        <strong>🟠 CONFIDENCE</strong> — Score global de fiabilité du modèle pour cette action (basé sur la volatilité et l'historique).<br>
-                        <span style="color: #7C4DFF;">Exemple: 85% signifie que le modèle est assez confiant dans ses prédictions.</span>
-                    </div>
+                    <div class="glossary-title">🎯 DÉFINITIONS</div>
+                    <div class="glossary-item"><strong>DIRECTION</strong> — Pourcentage de prédictions correctes (hausse/baisse)</div>
+                    <div class="glossary-item"><strong>VOLATILITÉ</strong> — Amplitude des variations du prix sur un an</div>
+                    <div class="glossary-item"><strong>SHARPE</strong> — Rendement obtenu par unité de risque prise</div>
+                    <div class="glossary-item"><strong>CONFIDENCE</strong> — Score global de fiabilité du modèle</div>
                 </div>
                 """, unsafe_allow_html=True)
+            
+            st.markdown("<div class='section-title'>📊 MÉTRIQUES</div>", unsafe_allow_html=True)
             
             col_a, col_b, col_c, col_d = st.columns(4)
             
@@ -692,42 +804,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             <div class="metric-card">
                 <div class="metric-title">🎯 DIRECTION</div>
                 <div class="metric-value" style="color: #00D4AA;">{dir_acc:.0f}%</div>
-                <div class="metric-explanation">Précision des prédictions de hausse/baisse</div>
+                <div class="metric-explanation">Précision des prédictions</div>
             </div>
             """, unsafe_allow_html=True)
             
-            col_b.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-title">⚡ VOLATILITÉ</div>
-                <div class="metric-value" style="color: #FFB74D;">{vol*100:.0f}%</div>
-                <div class="metric-explanation">Amplitude des variations du prix sur un an</div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            sharpe = trend/vol if vol > 0 else 0
-            sharpe_color = "#00D4AA" if sharpe > 0.5 else "#FFB74D" if sharpe > 0 else "#FF4D6D"
-            col_c.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-title">📈 SHARPE</div>
-                <div class="metric-value" style="color: {sharpe_color};">{sharpe:.2f}</div>
-                <div class="metric-explanation">Rendement gagné par unité de risque prise</div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            confidence = min(95, 65 + int(vol*100))
-            col_d.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-title">🔒 CONFIDENCE</div>
-                <div class="metric-value" style="color: #7C4DFF;">{confidence}%</div>
-                <div class="metric-explanation">Score global de fiabilité du modèle</div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Disclaimer
-            st.markdown("""
-            <div class="disclaimer">
-                <p>⚠️ Prédictions basées sur LSTM + XGBoost. Ne constitue pas un conseil financier.</p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            st.session_state.analyze_clicked = False
