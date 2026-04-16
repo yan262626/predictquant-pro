@@ -35,13 +35,13 @@ h1 {
 
 .subtitle {
     text-align: center;
-    color: #FF914D;
+    color: #7C4DFF;
     letter-spacing: 3px;
     font-size: 9px;
     margin-top: 0;
 }
 
-/* Radio buttons en orange */
+/* ========== RADIO BUTTONS EN VIOLET ========== */
 .stRadio {
     margin: 20px 0;
 }
@@ -55,8 +55,8 @@ h1 {
     background: #0D0F1A !important;
     padding: 12px 28px !important;
     border-radius: 50px !important;
-    border: 2px solid #FF914D !important;
-    color: #FF914D !important;
+    border: 2px solid #7C4DFF !important;
+    color: #7C4DFF !important;
     font-size: 16px !important;
     font-weight: 700 !important;
     letter-spacing: 1px !important;
@@ -65,9 +65,9 @@ h1 {
     cursor: pointer !important;
 }
 .stRadio label:hover {
-    border-color: #7C4DFF !important;
-    background: rgba(124, 77, 255, 0.1) !important;
-    color: #7C4DFF !important;
+    border-color: #00D4AA !important;
+    background: rgba(0, 212, 170, 0.1) !important;
+    color: #00D4AA !important;
     transform: translateY(-2px);
 }
 .stRadio div[data-baseweb="radio"] {
@@ -126,9 +126,9 @@ h1 {
     font-weight: 700;
 }
 
-/* Fiabilité en orange */
+/* Fiabilité */
 .fiability {
-    color: #FF914D !important;
+    color: #7C4DFF !important;
     font-size: 11px;
     font-weight: 600;
     margin-top: 6px;
@@ -159,7 +159,7 @@ h1 {
 /* Inputs */
 .stTextInput > div > div > input {
     background: #0D0F1A !important;
-    border: 2px solid #2A3050 !important;
+    border: 2px solid #7C4DFF !important;
     border-radius: 12px !important;
     color: white !important;
     font-size: 15px !important;
@@ -167,17 +167,17 @@ h1 {
     font-weight: 500 !important;
 }
 .stTextInput > div > div > input:focus {
-    border-color: #7C4DFF !important;
-    box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.2);
+    border-color: #00D4AA !important;
+    box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2);
 }
 .stTextInput > div > div > input::placeholder {
     color: #4A5070 !important;
     font-weight: 400;
 }
 
-/* Labels en orange */
+/* Labels des champs en violet */
 .stMarkdown p {
-    color: #FF914D !important;
+    color: #7C4DFF !important;
 }
 
 /* Button */
@@ -381,19 +381,19 @@ st.markdown("""
 # ══════════════════════════════════════════════════════════════════════════════
 # RECHERCHE
 # ══════════════════════════════════════════════════════════════════════════════
-st.markdown('<p style="text-align: center; color: #FF914D; font-size: 13px; margin-bottom: 5px;">🔍 TYPE DE RECHERCHE</p>', unsafe_allow_html=True)
+st.markdown('<p style="text-align: center; color: #7C4DFF; font-size: 13px; margin-bottom: 5px;">🔍 TYPE DE RECHERCHE</p>', unsafe_allow_html=True)
 search_type = st.radio("", ["📊 SYMBOLE", "🔢 ISIN", "🔍 NOM"], horizontal=True, label_visibility="collapsed")
 
 query = ""
 
 if search_type == "📊 SYMBOLE":
-    st.markdown('<p style="color: #FF914D; font-size: 12px; margin-bottom: 5px;">Entrez un symbole boursier</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #7C4DFF; font-size: 12px; margin-bottom: 5px;">Entrez un symbole boursier</p>', unsafe_allow_html=True)
     query = st.text_input("", value="AAPL", placeholder="Ex: AAPL, TSLA, MSFT, NVDA, IREN", label_visibility="collapsed")
     if query:
         st.session_state.selected_symbol = query.upper()
 
 elif search_type == "🔢 ISIN":
-    st.markdown('<p style="color: #FF914D; font-size: 12px; margin-bottom: 5px;">Entrez un code ISIN (12 caractères)</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #7C4DFF; font-size: 12px; margin-bottom: 5px;">Entrez un code ISIN (12 caractères)</p>', unsafe_allow_html=True)
     isin_input = st.text_input("", placeholder="Ex: US0378331005 pour Apple", label_visibility="collapsed")
     if isin_input:
         ticker_result = isin_to_ticker(isin_input)
@@ -404,7 +404,7 @@ elif search_type == "🔢 ISIN":
             st.warning("⚠️ ISIN non reconnu")
 
 elif search_type == "🔍 NOM":
-    st.markdown('<p style="color: #FF914D; font-size: 12px; margin-bottom: 5px;">Entrez le nom d\'une entreprise</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #7C4DFF; font-size: 12px; margin-bottom: 5px;">Entrez le nom d\'une entreprise</p>', unsafe_allow_html=True)
     name_input = st.text_input("", placeholder="Ex: Apple, Tesla, BNP Paribas", label_visibility="collapsed")
     if name_input:
         with st.spinner("Recherche..."):
@@ -478,7 +478,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             </div>
             """, unsafe_allow_html=True)
             
-            # ========== LÉGENDE DÉTAILLÉE DES COURBES ==========
+            # Légende des courbes
             st.markdown("""
             <div class="legend-box">
                 <div class="legend-item">
@@ -505,10 +505,9 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             </div>
             """, unsafe_allow_html=True)
             
-            # Graphique SANS ZOOM avec légende améliorée
+            # Graphique
             fig = go.Figure()
             
-            # Courbe des prix
             fig.add_trace(go.Scatter(
                 x=data.index,
                 y=data['Close'],
@@ -518,7 +517,6 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
                 name='Prix de clôture'
             ))
             
-            # MA20
             ma20 = data['Close'].rolling(20).mean()
             fig.add_trace(go.Scatter(
                 x=data.index, 
@@ -527,7 +525,6 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
                 name='MA20 (moyenne 20 jours)'
             ))
             
-            # MA50
             ma50 = data['Close'].rolling(50).mean()
             fig.add_trace(go.Scatter(
                 x=data.index, 
@@ -557,7 +554,6 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             fig.update_xaxes(showgrid=False, zeroline=False, color='#2A3050', title='Date')
             fig.update_yaxes(showgrid=True, gridcolor='#1A1E30', zeroline=False, title='Prix (USD)')
             
-            # Désactivation du zoom
             config = {'displayModeBar': True, 'scrollZoom': False, 'staticPlot': False}
             st.plotly_chart(fig, use_container_width=True, config=config)
             
@@ -628,7 +624,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             dir_acc = 58 + (np.random.randn() * 3)
             col_a.markdown(f"""
             <div class="metric-card">
-                <div style="font-size: 9px; color: #FF914D;">DIRECTION</div>
+                <div style="font-size: 9px; color: #7C4DFF;">DIRECTION</div>
                 <div style="font-size: 20px; font-weight: 700; color: #00D4AA;">{dir_acc:.0f}%</div>
                 <div style="font-size: 8px;">Précision directionnelle</div>
             </div>
@@ -636,7 +632,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             
             col_b.markdown(f"""
             <div class="metric-card">
-                <div style="font-size: 9px; color: #FF914D;">VOLATILITÉ</div>
+                <div style="font-size: 9px; color: #7C4DFF;">VOLATILITÉ</div>
                 <div style="font-size: 20px; font-weight: 700;">{vol*100:.0f}%</div>
                 <div style="font-size: 8px;">Variation annuelle</div>
             </div>
@@ -646,7 +642,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             sharpe_color = "#00D4AA" if sharpe > 0.5 else "#FFB74D"
             col_c.markdown(f"""
             <div class="metric-card">
-                <div style="font-size: 9px; color: #FF914D;">SHARPE</div>
+                <div style="font-size: 9px; color: #7C4DFF;">SHARPE</div>
                 <div style="font-size: 20px; font-weight: 700; color: {sharpe_color};">{sharpe:.2f}</div>
                 <div style="font-size: 8px;">Rendement / Risque</div>
             </div>
@@ -655,7 +651,7 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             confidence = min(95, 65 + int(vol*100))
             col_d.markdown(f"""
             <div class="metric-card">
-                <div style="font-size: 9px; color: #FF914D;">CONFIDENCE</div>
+                <div style="font-size: 9px; color: #7C4DFF;">CONFIDENCE</div>
                 <div style="font-size: 20px; font-weight: 700; color: #7C4DFF;">{confidence}%</div>
                 <div style="font-size: 8px;">Score global modèle</div>
             </div>
