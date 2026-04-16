@@ -3,6 +3,7 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
+import time
 
 st.set_page_config(page_title="PredictQuant Pro", layout="centered")
 
@@ -28,12 +29,24 @@ st.caption("LSTM · XGBoost · Monte Carlo")
 
 symbol = st.text_input("Symbole", value="AAPL", placeholder="AAPL, TSLA, MSFT, NVDA")
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=300, show_spinner=False)
 def get_stock_data(symbol):
-    ticker = yf.Ticker(symbol)
-    data = ticker.history(period="1y")
-    info = ticker.info
-    return data, info
+    try:
+        ticker = yf.Ticker(symbol)
+        # Ajout d'un petit délai pour éviter le rate limiting
+        time.sleep(1)
+        data = ticker.history(period="6mo")
+        if data.empty:
+            return None, None
+        info = {}
+        try:
+            info = ticker.info
+        except:
+            pass
+        return data, info
+    except Exception as e:
+        st.warning(f"⚠️ Erreur de connexion: {str(e)[:50]}... Réessaie dans 30 secondes.")
+        return None, None
 
 if st.button("🚀 LANCER L'ANALYSE", use_container_width=True):
     if not symbol:
@@ -42,16 +55,17 @@ if st.button("🚀 LANCER L'ANALYSE", use_container_width=True):
         with st.spinner("Analyse en cours..."):
             data, info = get_stock_data(symbol.upper())
             
-            if data.empty:
-                st.error("Symbole non trouvé. Essayez AAPL, TSLA, MSFT...")
+            if data is None or data.empty:
+                st.error("❌ Symbole non trouvé ou problème de connexion. Réessaie dans 1 minute.")
+                st.info("💡 Astuce : Utilise des symboles comme AAPL, TSLA, MSFT, NVDA, GOOGL")
             else:
                 current = data['Close'].iloc[-1]
-                prev = data['Close'].iloc[-2]
-                change = ((current - prev) / prev) * 100
+                prev = data['Close'].iloc[-2] if len(data) > 1 else current
+                change = ((current - prev) / prev) * 100 if prev != 0 else 0
                 
                 col1, col2, col3 = st.columns(3)
                 col1.metric("💵 Prix", f"${current:.2f}")
-                col2.metric("📊 Var. 1J", f"{change:+.2f}%", delta=f"{change:+.2f}%")
+                col2.metric("📊 Var. 1J", f"{change:+.2f}%", delta=f"{change:+.2f}%" if change != 0 else None)
                 col3.metric("📦 Volume", f"{data['Volume'].iloc[-1]:,.0f}")
                 
                 # Graphique
@@ -76,46 +90,57 @@ if st.button("🚀 LANCER L'ANALYSE", use_container_width=True):
                 # Indicateurs techniques
                 st.subheader("📊 INDICATEURS TECHNIQUES")
                 
-                # RSI simplifié
-                delta = data['Close'].diff()
-                gain = delta.where(delta > 0, 0).rolling(14).mean()
-                loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
-                rs = gain / loss
-                rsi = 100 - (100 / (1 + rs)).iloc[-1]
+                # RSI
+                if len(data) > 14:
+                    delta = data['Close'].diff()
+                    gain = delta.where(delta > 0, 0).rolling(14).mean()
+                    loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
+                    rs = gain / loss
+                    rsi = 100 - (100 / (1 + rs)).iloc[-1]
+                else:
+                    rsi = 50
                 
-                # MACD simplifié
-                ema12 = data['Close'].ewm(span=12).mean()
-                ema26 = data['Close'].ewm(span=26).mean()
-                macd = (ema12 - ema26).iloc[-1]
+                # MACD
+                if len(data) > 26:
+                    ema12 = data['Close'].ewm(span=12).mean()
+                    ema26 = data['Close'].ewm(span=26).mean()
+                    macd = (ema12 - ema26).iloc[-1]
+                else:
+                    macd = 0
                 
                 col_a, col_b = st.columns(2)
                 with col_a:
                     rsi_color = "#00D4AA" if 30 < rsi < 70 else "#FF4D6D"
+                    rsi_text = "✅ Neutre" if 30 < rsi < 70 else ("⚠️ Suracheté" if rsi > 70 else "⚠️ Survente")
                     st.markdown(f"""
                     <div class='metric-card'>
                         <b>RSI (14)</b><br>
                         <span style='font-size:28px;color:{rsi_color};'>{rsi:.1f}</span><br>
-                        <small>{'✅ Neutre' if 30 < rsi < 70 else '⚠️ Suracheté' if rsi > 70 else '⚠️ Survente'}</small>
+                        <small>{rsi_text}</small>
                     </div>
                     """, unsafe_allow_html=True)
                 
                 with col_b:
                     macd_color = "#00D4AA" if macd > 0 else "#FF4D6D"
+                    macd_text = "📈 Tendance haussière" if macd > 0 else "📉 Tendance baissière"
                     st.markdown(f"""
                     <div class='metric-card'>
                         <b>MACD</b><br>
                         <span style='font-size:28px;color:{macd_color};'>{macd:+.3f}</span><br>
-                        <small>{'📈 Tendance haussière' if macd > 0 else '📉 Tendance baissière'}</small>
+                        <small>{macd_text}</small>
                     </div>
                     """, unsafe_allow_html=True)
                 
                 # Prédictions
                 st.subheader("🎯 PRÉVISIONS HYBRIDES")
                 
-                # Simulation de prédictions basées sur tendance + volatilité
                 returns = data['Close'].pct_change().dropna()
-                vol = returns.std() * np.sqrt(252)
-                trend = returns.mean() * 252
+                if len(returns) > 0:
+                    vol = returns.std() * np.sqrt(252)
+                    trend = returns.mean() * 252
+                else:
+                    vol = 0.2
+                    trend = 0.05
                 
                 pred_7d = current * (1 + trend/52)
                 pred_30d = current * (1 + trend/12)
@@ -146,9 +171,9 @@ if st.button("🚀 LANCER L'ANALYSE", use_container_width=True):
                 </div>
                 """, unsafe_allow_html=True)
                 
-                # Infos société
-                if info.get('longName'):
+                # Info société
+                if info and info.get('longName'):
                     st.divider()
-                    st.caption(f"🏢 {info.get('longName')} · {info.get('sector', '')} · {info.get('exchange', '')}")
+                    st.caption(f"🏢 {info.get('longName', symbol)} · {info.get('sector', '')} · {info.get('exchange', '')}")
                 
                 st.caption("⚠️ Les prédictions sont basées sur l'analyse technique. Ne constituent pas un conseil financier.")
