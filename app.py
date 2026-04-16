@@ -41,28 +41,43 @@ h1 {
     margin-top: 0;
 }
 
-/* Onglets de recherche */
-.search-tabs {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
+/* ========== RADIO BUTTONS AMÉLIORÉS ========== */
+.stRadio {
     margin: 20px 0;
 }
-.search-tab {
-    background: #0D0F1A;
-    border: 1px solid #1E2340;
-    border-radius: 30px;
-    padding: 8px 20px;
-    color: #8A9AB0;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    text-align: center;
+.stRadio > div {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
 }
-.search-tab.active {
-    background: linear-gradient(90deg, #7C4DFF, #00D4AA);
-    border-color: transparent;
-    color: white;
+.stRadio label {
+    background: #0D0F1A !important;
+    padding: 12px 28px !important;
+    border-radius: 50px !important;
+    border: 2px solid #2A3050 !important;
+    color: #E8EAF0 !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    font-family: 'Inter', sans-serif !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+}
+.stRadio label:hover {
+    border-color: #7C4DFF !important;
+    background: rgba(124, 77, 255, 0.1) !important;
+    transform: translateY(-2px);
+}
+.stRadio div[data-baseweb="radio"] {
+    display: none;
+}
+/* Option active */
+.stRadio div[role="radiogroup"] > div:has(input:checked) label {
+    background: linear-gradient(135deg, #7C4DFF 0%, #00D4AA 100%) !important;
+    border-color: transparent !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(124, 77, 255, 0.4);
 }
 
 /* Cartes métriques */
@@ -141,47 +156,20 @@ h1 {
 /* Inputs */
 .stTextInput > div > div > input {
     background: #0D0F1A !important;
-    border: 2px solid #1E2340 !important;
+    border: 2px solid #2A3050 !important;
     border-radius: 12px !important;
     color: white !important;
-    font-size: 14px !important;
-    padding: 10px 15px !important;
+    font-size: 15px !important;
+    padding: 12px 18px !important;
+    font-weight: 500 !important;
 }
-
-/* Radio buttons - AMÉLIORÉ */
-.stRadio {
-    margin: 15px 0;
-}
-.stRadio > div {
-    gap: 12px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-.stRadio label {
-    background: #0D0F1A !important;
-    padding: 10px 24px !important;
-    border-radius: 40px !important;
-    border: 1.5px solid #1E2340 !important;
-    color: #8A9AB0 !important;
-    font-size: 14px !important;
-    font-weight: 600 !important;
-    transition: all 0.2s;
-}
-.stRadio label:hover {
+.stTextInput > div > div > input:focus {
     border-color: #7C4DFF !important;
-    color: #7C4DFF !important;
+    box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.2);
 }
-.stRadio div[data-baseweb="radio"] {
-    display: none;
-}
-.stRadio label[data-baseweb="radio"] {
-    background: transparent;
-}
-/* Style pour l'option active */
-.stRadio div[role="radiogroup"] > div:has(input:checked) label {
-    background: linear-gradient(90deg, #7C4DFF, #00D4AA) !important;
-    border-color: transparent !important;
-    color: white !important;
+.stTextInput > div > div > input::placeholder {
+    color: #4A5070 !important;
+    font-weight: 400;
 }
 
 /* Button */
@@ -191,7 +179,8 @@ h1 {
     border-radius: 12px !important;
     padding: 12px !important;
     font-weight: 700 !important;
-    font-size: 14px !important;
+    font-size: 16px !important;
+    letter-spacing: 1px !important;
     width: 100% !important;
 }
 
@@ -250,7 +239,7 @@ h1 {
     .pred-price { font-size: 16px; }
     .metric-card { padding: 8px; }
     .pred-card { padding: 8px 4px; }
-    .stRadio label { padding: 6px 16px !important; font-size: 12px !important; }
+    .stRadio label { padding: 8px 18px !important; font-size: 13px !important; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -345,7 +334,7 @@ def calculate_predictions(data, current_price):
     }, vol, trend
 
 # ══════════════════════════════════════════════════════════════════════════════
-# SESSION STATE POUR LE SYMBOLE SÉLECTIONNÉ
+# SESSION STATE
 # ══════════════════════════════════════════════════════════════════════════════
 if 'selected_symbol' not in st.session_state:
     st.session_state.selected_symbol = None
@@ -363,21 +352,24 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
-# RECHERCHE
+# RECHERCHE - RADIO BUTTONS AMÉLIORÉS
 # ══════════════════════════════════════════════════════════════════════════════
-search_type = st.radio("", ["📊 SYMBOLE", "🔢 ISIN", "🔍 NOM"], horizontal=True)
+st.markdown('<p style="text-align: center; color: #8A9AB0; font-size: 13px; margin-bottom: 5px;">🔍 TYPE DE RECHERCHE</p>', unsafe_allow_html=True)
+search_type = st.radio("", ["📊 SYMBOLE", "🔢 ISIN", "🔍 NOM"], horizontal=True, label_visibility="collapsed")
 
 query = ""
 
 # ─────────────── MODE SYMBOLE ───────────────
 if search_type == "📊 SYMBOLE":
+    st.markdown('<p style="color: #7C4DFF; font-size: 12px; margin-bottom: 5px;">Entrez un symbole boursier</p>', unsafe_allow_html=True)
     query = st.text_input("", value="AAPL", placeholder="Ex: AAPL, TSLA, MSFT, NVDA, IREN", label_visibility="collapsed")
     if query:
         st.session_state.selected_symbol = query.upper()
 
 # ─────────────── MODE ISIN ───────────────
 elif search_type == "🔢 ISIN":
-    isin_input = st.text_input("", placeholder="Code ISIN (ex: US0378331005 pour Apple)", label_visibility="collapsed")
+    st.markdown('<p style="color: #7C4DFF; font-size: 12px; margin-bottom: 5px;">Entrez un code ISIN (12 caractères)</p>', unsafe_allow_html=True)
+    isin_input = st.text_input("", placeholder="Ex: US0378331005 pour Apple", label_visibility="collapsed")
     if isin_input:
         ticker_result = isin_to_ticker(isin_input)
         if ticker_result:
@@ -388,25 +380,25 @@ elif search_type == "🔢 ISIN":
 
 # ─────────────── MODE NOM ───────────────
 elif search_type == "🔍 NOM":
-    name_input = st.text_input("", placeholder="Nom de l'entreprise (ex: Apple, Tesla)", label_visibility="collapsed")
+    st.markdown('<p style="color: #7C4DFF; font-size: 12px; margin-bottom: 5px;">Entrez le nom d\'une entreprise</p>', unsafe_allow_html=True)
+    name_input = st.text_input("", placeholder="Ex: Apple, Tesla, BNP Paribas", label_visibility="collapsed")
     if name_input:
         with st.spinner("Recherche..."):
             matches = search_by_name(name_input)
         
         if matches:
             st.markdown("### 📋 RÉSULTATS :")
-            # Créer des boutons pour chaque résultat
             cols = st.columns(min(4, len(matches)))
             for i, match in enumerate(matches):
                 with cols[i % 4]:
-                    if st.button(f"{match['symbol']}", key=f"btn_{match['symbol']}", use_container_width=True):
+                    if st.button(f"🔹 {match['symbol']}", key=f"btn_{match['symbol']}", use_container_width=True):
                         st.session_state.selected_symbol = match['symbol']
                         st.session_state.analyze_clicked = True
                         st.rerun()
             
-            # Afficher les noms complets en petit
+            # Afficher les noms complets
             for match in matches:
-                st.caption(f"🔹 {match['symbol']} - {match['name']}")
+                st.caption(f"📌 {match['symbol']} - {match['name']}")
         elif name_input:
             st.info("🔍 Aucun résultat. Essayez un autre nom.")
 
@@ -427,7 +419,6 @@ with col_btn2:
 if st.session_state.analyze_clicked and st.session_state.selected_symbol:
     symbol = st.session_state.selected_symbol
     
-    # Gestion des alias
     if symbol in TICKER_ALIAS:
         symbol = TICKER_ALIAS[symbol]
     
@@ -592,5 +583,4 @@ if st.session_state.analyze_clicked and st.session_state.selected_symbol:
             </div>
             """, unsafe_allow_html=True)
             
-            # Reset du flag
             st.session_state.analyze_clicked = False
